@@ -1,0 +1,77 @@
+@use '../DesignSystem_basic' as *;
+
+@mixin base_input {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: $radius_input;
+    cursor: text;
+
+    &:disabled {
+        opacity: 0.32;
+        cursor: not-allowed;
+    }
+}
+
+.input_txt {
+    @include base_input;
+    border: 1px solid $black_12;
+    font: $body_24;
+    color: $black_100;
+    background-color: $white_100;
+
+    &::placeholder {
+        color: $black_32;
+        opacity: 1;
+    }
+
+    &:hover {
+        border-color: $black_32;
+    }
+
+    &:focus {
+        border-color: $blue_100;
+        outline: none;
+    }
+
+    &:active {
+        border-color: $blue_100;
+    }
+
+    &.error {
+        border-color: $alert_12;
+
+        &::placeholder {
+            color: $alert_64;
+            opacity: 1;
+        }
+
+        &:hover {
+            border-color: $alert_48;
+        }
+
+        &:focus {
+            border-color: $alert_48;
+        }
+    }
+}
+
+.input-label {
+    display: flex;
+    font: $body_16;
+    padding: 0 1rem;
+    color: $black_64;
+
+    &.error {
+        color: $alert_100;
+    }
+}
+
+.input_labeled_txt {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}

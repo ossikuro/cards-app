@@ -2,7 +2,8 @@
 for easy connection with components */
 
 import Button from './Controls/button.jsx'
+import Input from './Controls/input.jsx'
 
-const Controls = { Button }
+const Controls = { Button, Input }
 
 export default Controls

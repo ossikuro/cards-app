@@ -14,6 +14,11 @@ function App() {
             <Controls.Button variant="black_txt">
                 Тестовая кнопка
             </Controls.Button>
+            <Controls.Input
+                label="test"
+                placeholder="проверка"
+                error={true}
+            ></Controls.Input>
             <div>
                 <a href="https://vite.dev" target="_blank">
                     <img src={viteLogo} className="logo" alt="Vite logo" />
