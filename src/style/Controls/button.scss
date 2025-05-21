@@ -1,0 +1,138 @@
+@use '../DesignSystem_basic' as *;
+
+@mixin base_btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius_button;
+    cursor: pointer;
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
+
+@mixin txt_btn {
+    @include base_btn;
+    font: $title_24;
+    padding: 0.75rem 1.5rem;
+}
+
+@mixin icon_btn {
+    @include base_btn;
+    padding: 0.75rem;
+    width: 3.5rem;
+    height: 3.5rem;
+
+    svg {
+        width: 2rem;
+        height: 2rem;
+        fill: currentColor;
+    }
+}
+
+.transparent_txt_btn {
+    @include txt_btn;
+    color: $blue_100;
+    background-color: transparent;
+
+    &:hover {
+        background-color: $blue_06;
+    }
+
+    &:active {
+        background-color: $blue_12;
+    }
+
+    &:disabled {
+        color: $black_32;
+        background-color: transparent;
+    }
+}
+
+.white_txt_btn {
+    @include txt_btn;
+    color: $white_100;
+    background-color: $white_12;
+
+    &:hover {
+        background-color: $white_24;
+    }
+
+    &:active {
+        background-color: $white_32;
+    }
+
+    &:disabled {
+        opacity: 0.32;
+    }
+}
+
+.black_txt_btn {
+    @include txt_btn;
+    color: $white_100;
+    background-color: $black_100;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: $white_100;
+        z-index: -1;
+    }
+
+    &:hover {
+        background-color: $black_64;
+    }
+
+    &:active {
+        background-color: $black_48;
+    }
+
+    &:disabled {
+        opacity: 0.32;
+    }
+}
+
+.transparent_icon_btn {
+    @include icon_btn;
+    color: $black_48;
+    background-color: transparent;
+
+    &:hover {
+        color: $black_64;
+        background-color: $black_03;
+    }
+
+    &:active {
+        color: $black_100;
+        background-color: $black_06;
+    }
+
+    &:disabled {
+        opacity: 0.32;
+        color: $black_48;
+        background-color: transparent;
+    }
+}
+
+.white_icon_btn {
+    @include icon_btn;
+    color: $white_100;
+    background-color: transparent;
+
+    &:hover {
+        background-color: $white_12;
+    }
+
+    &:active {
+        background-color: $white_24;
+    }
+
+    &:disabled {
+        opacity: 0.32;
+    }
+}

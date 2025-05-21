@@ -1,0 +1,93 @@
+/* The basic file with design system 
+"atoms" like colors, fonts, sizes */
+
+:root {
+    --font-main: 'Rubik', sans-serif;
+    --font-size: 16px;
+    --transition: 0.3s ease;
+}
+
+/* ---------- Colors ---------- */
+
+$black_100: rgba(0, 0, 0, 1);
+$black_64: rgba(0, 0, 0, 0.64);
+$black_48: rgba(0, 0, 0, 0.48);
+$black_32: rgba(0, 0, 0, 0.32);
+$black_12: rgba(0, 0, 0, 0.12);
+$black_09: rgba(0, 0, 0, 0.09);
+$black_06: rgba(0, 0, 0, 0.06);
+$black_03: rgba(0, 0, 0, 0.03);
+
+$white_100: rgba(255, 255, 255, 1);
+$white_32: rgba(255, 255, 255, 0.32);
+$white_24: rgba(255, 255, 255, 0.24);
+$white_12: rgba(255, 255, 255, 0.12);
+
+$blue_100: rgba(96, 186, 245, 1);
+$blue_12: rgba(96, 186, 245, 0.12);
+$blue_06: rgba(96, 186, 245, 0.06);
+
+$alert_100: rgba(241, 105, 89, 1);
+$alert_64: rgba(241, 105, 89, 0.64);
+$alert_48: rgba(241, 105, 89, 0.48);
+$alert_12: rgba(241, 105, 89, 0.12);
+
+$blue_bg: linear-gradient(
+    to bottom,
+    rgba(137, 217, 244, 1),
+    rgba(79, 149, 240, 1)
+);
+$purple_bg: linear-gradient(
+    to bottom,
+    rgba(231, 186, 244, 1),
+    rgba(143, 140, 227, 1)
+);
+$orange_bg: linear-gradient(
+    to bottom,
+    rgba(254, 224, 155, 1),
+    rgba(227, 143, 140, 1)
+);
+
+/* ---------- Fonts ---------- */
+
+@font-face {
+    font-family: 'Rubik';
+    src: url('../assets/fonts/Rubik-Regular.woff2') format('woff2'),
+        url('../assets/fonts/Rubik-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Rubik';
+    src: url('../assets/fonts/Rubik-Medium.woff2') format('woff2'),
+        url('../assets/fonts/Rubik-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Rubik';
+    src: url('../assets/fonts/Rubik-SemiBold.woff2') format('woff2'),
+        url('../assets/fonts/Rubik-SemiBold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+$title_48: normal 600 3rem/3.5rem 'Rubik', sans-serif;
+$title_40: normal 500 2.5rem/3rem 'Rubik', sans-serif;
+$title_24: normal 600 1.5rem/2rem 'Rubik', sans-serif;
+
+$body_24: normal 400 1.5rem/2rem 'Rubik', sans-serif;
+$body_16: normal 400 1rem/1.5rem 'Rubik', sans-serif;
+
+/* ---------- Sizes ---------- */
+
+$radius_card: 1rem;
+$radius_button: 0.75rem;
+$radius_input: 0.75rem;
+
+$padding_card: 1.5rem;
