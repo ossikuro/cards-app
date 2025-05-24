@@ -9,7 +9,8 @@ const Input = ({
     ...rest
 }) => {
     const inputClass = `input_txt${error ? ' error' : ''}`
-    const labelClass = `input-label error${error ? ' error' : ''}`
+    const labelClass = `input-label${error ? ' error' : ''}`
+
     return label ? (
         <div className="input_labeled_txt">
             <label className={labelClass}>{label}</label>

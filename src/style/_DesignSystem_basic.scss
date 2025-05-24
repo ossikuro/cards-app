@@ -10,6 +10,7 @@
 /* ---------- Colors ---------- */
 
 $black_100: rgba(0, 0, 0, 1);
+$black_80: rgba(0, 0, 0, 0.8);
 $black_64: rgba(0, 0, 0, 0.64);
 $black_48: rgba(0, 0, 0, 0.48);
 $black_32: rgba(0, 0, 0, 0.32);
@@ -52,8 +53,8 @@ $orange_bg: linear-gradient(
 
 @font-face {
     font-family: 'Rubik';
-    src: url('../assets/fonts/Rubik-Regular.woff2') format('woff2'),
-        url('../assets/fonts/Rubik-Regular.woff') format('woff');
+    src: url('../../assets/fonts/Rubik-Regular.woff2') format('woff2'),
+        url('../../assets/fonts/Rubik-Regular.woff') format('woff');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -61,8 +62,8 @@ $orange_bg: linear-gradient(
 
 @font-face {
     font-family: 'Rubik';
-    src: url('../assets/fonts/Rubik-Medium.woff2') format('woff2'),
-        url('../assets/fonts/Rubik-Medium.woff') format('woff');
+    src: url('../../assets/fonts/Rubik-Medium.woff2') format('woff2'),
+        url('.../../assets/fonts/Rubik-Medium.woff') format('woff');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
@@ -70,8 +71,8 @@ $orange_bg: linear-gradient(
 
 @font-face {
     font-family: 'Rubik';
-    src: url('../assets/fonts/Rubik-SemiBold.woff2') format('woff2'),
-        url('../assets/fonts/Rubik-SemiBold.woff') format('woff');
+    src: url('../../assets/fonts/Rubik-SemiBold.woff2') format('woff2'),
+        url('../../assets/fonts/Rubik-SemiBold.woff') format('woff');
     font-weight: 600;
     font-style: normal;
     font-display: swap;
