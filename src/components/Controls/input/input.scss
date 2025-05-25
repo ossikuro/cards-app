@@ -1,4 +1,4 @@
-@use '../DesignSystem_basic' as *;
+@use '../../../style/DesignSystem_basic' as *;
 
 @mixin base_input {
     display: flex;

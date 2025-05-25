@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Controls from '../../style'
+import Controls from '../Controls'
 import './WordCardEditable.scss'
 import DeleteIcon from '../../assets/icons/delete.svg?react'
 
@@ -34,6 +34,7 @@ const WordCardEditable = ({ index, onDelete, initialData = {} }) => {
                     value={transcription}
                     onChange={(e) => setTranscription(e.target.value)}
                 />
+                <div className="editable_card_text">–</div>
                 <Controls.Input
                     label="Перевод"
                     value={translation}
