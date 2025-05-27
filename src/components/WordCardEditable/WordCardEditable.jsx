@@ -3,21 +3,37 @@ import Controls from '../Controls'
 import './WordCardEditable.scss'
 import DeleteIcon from '../../assets/icons/delete.svg?react'
 
-const WordCardEditable = ({ index, onDelete, initialData = {} }) => {
-    const [word, setWord] = useState(initialData.word || '')
-    const [transcription, setTranscription] = useState(
-        initialData.transcription || ''
-    )
-    const [translation, setTranslation] = useState(
-        initialData.translation || ''
-    )
+// data берем ключи, которые нам отдали снаружи или пустой объект, 2 функции из родителя, индекс из родителя
+const WordCardEditable = ({ data = {}, onChange, onDelete, index }) => {
+    // для переменной word меняй значение по команде setWord. Для изменения используем хук и берем значение из data или пустую строчку
+    const [word, setWord] = useState(data.word || '')
+    const [transcription, setTranscription] = useState(data.transcription || '')
+    const [translation, setTranslation] = useState(data.translation || '')
 
-    // Сохраняем изменения в localStorage при каждом обновлении
+    // Обновляем значения ключей, если массив слов в родителе изменился
     useEffect(() => {
-        const current = JSON.parse(localStorage.getItem('words') || '[]')
-        current[index] = { word, transcription, translation }
-        localStorage.setItem('words', JSON.stringify(current))
-    }, [word, transcription, translation, index])
+        setWord(data.word || '')
+        setTranscription(data.transcription || '')
+        setTranslation(data.translation || '')
+    }, [data.word, data.transcription, data.translation])
+
+    // Обновляем родителя прямо при изменении
+    const handleChange = (field, value) => {
+        const updated = {
+            word,
+            transcription,
+            translation,
+            [field]: value,
+        }
+
+        // Локально обновляем
+        if (field === 'word') setWord(value)
+        if (field === 'transcription') setTranscription(value)
+        if (field === 'translation') setTranslation(value)
+
+        // Отправляем наружу
+        onChange(updated)
+    }
 
     return (
         <div className="editable_card_wrapper">
@@ -27,26 +43,27 @@ const WordCardEditable = ({ index, onDelete, initialData = {} }) => {
                 <Controls.Input
                     label="Английское слово"
                     value={word}
-                    onChange={(e) => setWord(e.target.value)}
+                    onChange={(e) => handleChange('word', e.target.value)}
                 />
                 <Controls.Input
                     label="Транскрипция"
                     value={transcription}
-                    onChange={(e) => setTranscription(e.target.value)}
+                    onChange={(e) =>
+                        handleChange('transcription', e.target.value)
+                    }
                 />
                 <div className="editable_card_text">–</div>
                 <Controls.Input
                     label="Перевод"
                     value={translation}
-                    onChange={(e) => setTranslation(e.target.value)}
+                    onChange={(e) =>
+                        handleChange('translation', e.target.value)
+                    }
                 />
             </div>
 
             <div className="editable_card_fields_delete_wrapper">
-                <button
-                    className="transparent_icon_btn"
-                    onClick={() => onDelete(index)}
-                >
+                <button className="transparent_icon_btn" onClick={onDelete}>
                     <DeleteIcon />
                 </button>
             </div>

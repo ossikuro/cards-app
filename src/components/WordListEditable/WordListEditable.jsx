@@ -33,8 +33,13 @@ const WordListEditable = () => {
                         <WordCardEditable
                             key={idx}
                             index={idx}
-                            initialData={wordData}
-                            onDelete={handleDelete}
+                            data={wordData}
+                            onChange={(newData) => {
+                                const updated = [...words]
+                                updated[idx] = newData
+                                updateStorage(updated)
+                            }}
+                            onDelete={() => handleDelete(idx)}
                         />
                     ))}
                     <AddWordButton onClick={handleAddWord} />
