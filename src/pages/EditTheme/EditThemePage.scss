@@ -1,10 +1,11 @@
 @use '../../style/DesignSystem_basic' as *;
 #root {
     background: $blue_bg;
+    min-height: 100vh;
+    width: 100%;
 }
 
-.EditThemePage {
-}
+//.EditThemePage {}
 
 .EditThemePage_ContentWrapper {
     padding: 3rem;

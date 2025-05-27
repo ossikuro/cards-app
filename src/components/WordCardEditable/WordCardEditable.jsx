@@ -1,38 +1,35 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Controls from '../Controls'
 import './WordCardEditable.scss'
 import DeleteIcon from '../../assets/icons/delete.svg?react'
 
-// data берем ключи, которые нам отдали снаружи или пустой объект, 2 функции из родителя, индекс из родителя
+// передаем пропс в функцию: массив с ключами из родителя, 2 функции и индекс
 const WordCardEditable = ({ data = {}, onChange, onDelete, index }) => {
-    // для переменной word меняй значение по команде setWord. Для изменения используем хук и берем значение из data или пустую строчку
+    // объявляем переменную word с функцией setWords, которая с помощью хука присваивает или значение из родителя или ''. Переменная нам нужна, потому что перед отправкой в родителя нам надо ее валидировать. И если валидацию пройдет - перезаписать значение в родительском массиве.
     const [word, setWord] = useState(data.word || '')
-    const [transcription, setTranscription] = useState(data.transcription || '')
-    const [translation, setTranslation] = useState(data.translation || '')
 
-    // Обновляем значения ключей, если массив слов в родителе изменился
-    useEffect(() => {
-        setWord(data.word || '')
-        setTranscription(data.transcription || '')
-        setTranslation(data.translation || '')
-    }, [data.word, data.transcription, data.translation])
+    // объявляем переменную error с функцией которая включает или выключает состояние ошибки.
+    const [error, setError] = useState(false)
 
-    // Обновляем родителя прямо при изменении
+    // валидация поля английское слово. Она принимает значение в поле и статус ошибки.
     const handleChange = (field, value) => {
-        const updated = {
-            word,
-            transcription,
-            translation,
-            [field]: value,
+        // если мы смотрим на поле слово
+        if (field === 'word') {
+            //регулярка проверки
+            const onlyEnglish = /^[\x00-\x7F]*$/
+            // если значение удовлетворяет регулярке, то делаем...
+            if (onlyEnglish.test(value)) {
+                setError(false) // убираем ошибку
+                setWord(value) // обновляем слово локально
+                onChange({ ...data, word: value }) // запускаем обновление массива в родителе
+            } else {
+                setError(true) // ставим ошибку
+                return // не передаём родителю
+            }
+        } else {
+            //создаёт копию объекта data с одним обновлённым полем (по имени field), и передаёт его родителю через onChange. field в [], потому что field - это переменная.
+            onChange({ ...data, [field]: value })
         }
-
-        // Локально обновляем
-        if (field === 'word') setWord(value)
-        if (field === 'transcription') setTranscription(value)
-        if (field === 'translation') setTranslation(value)
-
-        // Отправляем наружу
-        onChange(updated)
     }
 
     return (
@@ -43,11 +40,13 @@ const WordCardEditable = ({ data = {}, onChange, onDelete, index }) => {
                 <Controls.Input
                     label="Английское слово"
                     value={word}
+                    error={error}
+                    //Когда пользователь введёт что-то в инпут, вызови функцию handleChange, и передай туда: поле 'word' и клик.поинпуту.значение
                     onChange={(e) => handleChange('word', e.target.value)}
                 />
                 <Controls.Input
                     label="Транскрипция"
-                    value={transcription}
+                    value={data.transcription || ''}
                     onChange={(e) =>
                         handleChange('transcription', e.target.value)
                     }
@@ -55,7 +54,7 @@ const WordCardEditable = ({ data = {}, onChange, onDelete, index }) => {
                 <div className="editable_card_text">–</div>
                 <Controls.Input
                     label="Перевод"
-                    value={translation}
+                    value={data.translation || ''}
                     onChange={(e) =>
                         handleChange('translation', e.target.value)
                     }
