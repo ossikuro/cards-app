@@ -119,6 +119,11 @@
     }
 }
 
+.transparent_icon_btn.active_btn {
+    color: $black_100;
+    background-color: $black_06;
+}
+
 .white_icon_btn {
     @include icon_btn;
     color: $white_100;

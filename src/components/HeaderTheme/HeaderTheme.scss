@@ -1,0 +1,26 @@
+@use '../../style/DesignSystem_basic' as *;
+
+.header_wrapper {
+    display: flex;
+    padding: 1rem 1.5rem;
+    gap: 0.5rem;
+    background-color: $white_100;
+}
+
+.header_title_text {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    font: $title_24;
+    color: $black_100;
+}
+
+.header_title_wordsCounter {
+    font: $body_16;
+    color: $black_64;
+}
+
+.header_buttons_wrapper {
+    display: flex;
+    gap: 0.5rem;
+}

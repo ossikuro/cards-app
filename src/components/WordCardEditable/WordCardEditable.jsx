@@ -62,9 +62,14 @@ const WordCardEditable = ({ data = {}, onChange, onDelete, index }) => {
             </div>
 
             <div className="editable_card_fields_delete_wrapper">
-                <button className="transparent_icon_btn" onClick={onDelete}>
+                <Controls.Button
+                    variant="transparent_icon"
+                    onClick={onDelete}
+                    type="button"
+                    aria-label="Удалить карточку"
+                >
                     <DeleteIcon />
-                </button>
+                </Controls.Button>
             </div>
         </div>
     )

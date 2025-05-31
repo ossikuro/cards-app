@@ -1,0 +1,50 @@
+@use '../../../style/DesignSystem_basic' as *;
+@use '../button/button.scss' as *;
+
+.menu_overlay_wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: transparent;
+    z-index: 1000;
+}
+
+.menu_content_wrapper {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    padding: 0.75rem 0;
+    border-radius: 1rem;
+    background-color: $white_100;
+    box-shadow: 0 0.25rem 0.75rem $black_12;
+}
+
+.menu_item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font: $body_24;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0;
+
+    color: $black_80;
+    background-color: transparent;
+
+    cursor: pointer;
+
+    &:hover {
+        background-color: $black_03;
+    }
+
+    &:active {
+        background-color: $black_06;
+    }
+
+    &:disabled {
+        color: $black_32;
+        background-color: transparent;
+        cursor: not-allowed;
+    }
+}
