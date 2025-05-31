@@ -4,7 +4,7 @@ import './WordCardEditable.scss'
 import DeleteIcon from '../../assets/icons/delete.svg?react'
 
 // передаем пропс в функцию: массив с ключами из родителя, 2 функции и индекс
-const WordCardEditable = ({ data = {}, onChange, onDelete, index }) => {
+const WordCardEditable = ({ data = {}, onChange, onDelete, index = 0 }) => {
     // объявляем переменную word с функцией setWords, которая с помощью хука присваивает или значение из родителя или ''. Переменная нам нужна, потому что перед отправкой в родителя нам надо ее валидировать. И если валидацию пройдет - перезаписать значение в родительском массиве.
     const [word, setWord] = useState(data.word || '')
 

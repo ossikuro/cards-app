@@ -4,8 +4,7 @@ import './HeaderTheme.scss'
 import MenuIcon from '../../assets/icons/menu.svg?react'
 import BackIcon from '../../assets/icons/chevron_left.svg?react'
 
-const HeaderListEditable = ({ wordsCount = 0 }) => {
-    const [isEditing, setIsEditing] = useState(false)
+const HeaderListEditable = ({ wordsCount = 0, isEditing, setIsEditing }) => {
     const [themeName, setThemeName] = useState('Список слов')
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const menuButtonRef = useRef(null)
@@ -74,22 +73,38 @@ const HeaderListEditable = ({ wordsCount = 0 }) => {
                     <MenuIcon />
                 </Controls.Button>
             </div>
-            {isMenuOpen && (
-                <Controls.Menu
-                    position={menuPosition}
-                    items={[
-                        {
-                            label: 'Редактировать',
-                            onClick: () => setIsEditing(true),
-                        },
-                        {
-                            label: 'Удалить',
-                            onClick: () => console.log('Удалить тему'),
-                        },
-                    ]}
-                    onClose={() => setIsMenuOpen(false)}
-                />
-            )}
+            {isMenuOpen &&
+                (isEditing ? (
+                    <Controls.Menu
+                        position={menuPosition}
+                        items={[
+                            {
+                                label: 'Тренировать',
+                                onClick: () => setIsEditing(false),
+                            },
+                            {
+                                label: 'Удалить',
+                                onClick: () => console.log('Удалить тему'),
+                            },
+                        ]}
+                        onClose={() => setIsMenuOpen(false)}
+                    />
+                ) : (
+                    <Controls.Menu
+                        position={menuPosition}
+                        items={[
+                            {
+                                label: 'Редактировать',
+                                onClick: () => setIsEditing(true),
+                            },
+                            {
+                                label: 'Удалить',
+                                onClick: () => console.log('Удалить тему'),
+                            },
+                        ]}
+                        onClose={() => setIsMenuOpen(false)}
+                    />
+                ))}
         </div>
     )
 }
