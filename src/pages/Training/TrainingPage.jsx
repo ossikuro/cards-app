@@ -1,9 +1,9 @@
-import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import HeaderTheme from '../../components/HeaderTheme/HeaderTheme'
-import WordListTraining from '../../components/WordListTraining/WordListTraining.jsx'
+import WordListTraining from '../../components/WordListTraining/WordListTraining'
 
-const TrainingPage = () => {
+const TrainingPage = ({ mode, setMode }) => {
     const navigate = useNavigate()
     const [words, setWords] = useState([])
 
@@ -12,11 +12,9 @@ const TrainingPage = () => {
         if (!stored) return
 
         const parsed = JSON.parse(stored)
-
         const filtered = parsed.filter(
             (item) => item?.word?.trim() && item?.translation?.trim()
         )
-
         setWords(filtered)
     }, [])
 
@@ -24,17 +22,17 @@ const TrainingPage = () => {
         <>
             <HeaderTheme
                 wordsCount={words.length}
-                mode="training"
+                mode={mode}
                 setMode={(newMode) => {
-                    if (newMode === 'edit') {
-                        navigate('/collection')
-                    }
+                    setMode(newMode)
+                    navigate('/collection')
                 }}
             />
-            {words.length === 0 ? (
-                <p className="training_empty">Нет слов для тренировки</p>
-            ) : (
+
+            {words.length > 0 ? (
                 <WordListTraining words={words} />
+            ) : (
+                <p className="training_empty">Нет слов для тренировки</p>
             )}
         </>
     )

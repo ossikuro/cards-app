@@ -4,23 +4,28 @@ import WordListEditable from '../../components/WordList/WordListEditable.jsx'
 import HeaderTheme from '../../components/HeaderTheme/HeaderTheme.jsx'
 import './EditThemePage.scss'
 
-const EditPage = () => {
-    const [mode, setMode] = useState('view')
+const EditThemePage = ({ mode, setMode }) => {
+    const navigate = useNavigate()
     const [words, setWords] = useState([])
+
     useEffect(() => {
         const stored = localStorage.getItem('words')
         const parsed = stored ? JSON.parse(stored) : []
         setWords(parsed)
     }, [])
-    const navigate = useNavigate()
+
     return (
         <div className="EditThemePage">
             <HeaderTheme
                 wordsCount={words.length}
                 mode={mode}
                 setMode={(newMode) => {
-                    if (newMode === 'training') navigate('/training')
-                    else setMode(newMode)
+                    if (newMode === 'training') {
+                        setMode('training')
+                        navigate('/training')
+                    } else {
+                        setMode(newMode)
+                    }
                 }}
             />
             <div className="EditThemePage_ContentWrapper">
@@ -34,4 +39,4 @@ const EditPage = () => {
     )
 }
 
-export default EditPage
+export default EditThemePage

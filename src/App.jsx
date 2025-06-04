@@ -1,15 +1,25 @@
+import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import EditThemePage from './pages/EditTheme/EditThemePage.jsx'
+import TrainingPage from './pages/Training/TrainingPage.jsx'
 import './App.css'
 import './style/reset.css'
 import './style/normalize.css'
-import EditThemePage from './pages/EditTheme/EditThemePage.jsx'
-import TrainingPage from './pages/Training/TrainingPage.jsx'
 
 const App = () => {
+    // 🎯 Общий режим: 'view' | 'edit' | 'training'
+    const [mode, setMode] = useState('view')
+
     return (
         <Routes>
-            <Route path="/collection" element={<EditThemePage />} />
-            <Route path="/training" element={<TrainingPage />} />
+            <Route
+                path="/collection"
+                element={<EditThemePage mode={mode} setMode={setMode} />}
+            />
+            <Route
+                path="/training"
+                element={<TrainingPage mode={mode} setMode={setMode} />}
+            />
         </Routes>
     )
 }

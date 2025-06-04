@@ -5,14 +5,13 @@ import './HeaderTheme.scss'
 import MenuIcon from '../../assets/icons/menu.svg?react'
 import BackIcon from '../../assets/icons/chevron_left.svg?react'
 
-const HeaderListEditable = ({ wordsCount = 0, mode = 'view', setMode }) => {
+const HeaderTheme = ({ wordsCount = 0, mode = 'view', setMode }) => {
     const [themeName, setThemeName] = useState('Список слов')
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const menuButtonRef = useRef(null)
     const [menuPosition, setMenuPosition] = useState(null)
     const navigate = useNavigate()
 
-    // загружаем из localStorage при старте
     useEffect(() => {
         const stored = localStorage.getItem('themeName')
         if (stored) setThemeName(stored)
@@ -104,20 +103,23 @@ const HeaderListEditable = ({ wordsCount = 0, mode = 'view', setMode }) => {
                             ? [
                                   {
                                       label: 'Редактировать',
-                                      onClick: () => setMode('edit'),
+                                      onClick: () => {
+                                          setMode('edit')
+                                          navigate('/collection')
+                                      },
                                   },
                                   {
                                       label: 'Просмотр слов',
-                                      onClick: () => setMode('view'),
+                                      onClick: () => {
+                                          setMode('view')
+                                          navigate('/collection')
+                                      },
                                   },
                               ]
                             : [
                                   {
                                       label: 'Редактировать',
-                                      onClick: () => {
-                                          setMode('edit')
-                                          navigate('/collection')
-                                      },
+                                      onClick: () => setMode('edit'),
                                   },
                                   {
                                       label: 'Удалить тему',
@@ -133,4 +135,4 @@ const HeaderListEditable = ({ wordsCount = 0, mode = 'view', setMode }) => {
     )
 }
 
-export default HeaderListEditable
+export default HeaderTheme
