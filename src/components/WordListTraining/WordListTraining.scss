@@ -1,0 +1,50 @@
+@use '../../style/DesignSystem_basic' as *;
+
+.training_content {
+    height: calc(100vh - 5.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.stack_wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: fit-content;
+    margin: auto;
+}
+
+.card_layer {
+    width: 100%;
+    transition: transform 0.3s ease;
+    margin-top: -33rem; // ← накладывание
+    transform-origin: center center;
+}
+
+.card_layer:first-child {
+    margin-top: 0; // первая не налегает
+}
+
+.card_layer--0 {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.card_layer--1 {
+    transform: scale(0.92);
+    opacity: 0.7;
+}
+
+.card_layer--2 {
+    transform: scale(0.84);
+    opacity: 0.4;
+}
+
+.stack_footer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}

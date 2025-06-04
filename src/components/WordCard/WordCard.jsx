@@ -7,20 +7,23 @@ const WordCard = ({ data = {}, index }) => {
         <div
             className={`card_wrapper${noTranslation ? ' no-translation' : ''}`}
         >
-            <div className="card_text">{index + 1}</div>
+            <div className="card_text">
+                {' '}
+                {typeof index === 'number' ? index + 1 : ''}
+            </div>
 
             <div className="card_fields_wrapper">
-                <div>
+                <div className="card_column">
                     Слово
-                    <div>{data.word}</div>
+                    <div className="card_word ">{data.word}</div>
                 </div>
-                <div>
-                    Транскрипция
-                    <div>{data.transcription}</div>
+                <div className="card_column">
+                    {data.transcription?.trim() === '' ? '' : 'Транскрипция'}
+                    <div className="card_word ">{data.transcription}</div>
                 </div>
-                <div>
+                <div className="card_column">
                     Перевод
-                    <div>{data.translation}</div>
+                    <div className="card_word ">{data.translation}</div>
                 </div>
             </div>
         </div>

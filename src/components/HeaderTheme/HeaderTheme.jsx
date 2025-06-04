@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Controls from '../Controls'
 import './HeaderTheme.scss'
 import MenuIcon from '../../assets/icons/menu.svg?react'
 import BackIcon from '../../assets/icons/chevron_left.svg?react'
 
-const HeaderListEditable = ({ wordsCount = 0, isEditing, setIsEditing }) => {
+const HeaderListEditable = ({ wordsCount = 0, mode = 'view', setMode }) => {
     const [themeName, setThemeName] = useState('Список слов')
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const menuButtonRef = useRef(null)
     const [menuPosition, setMenuPosition] = useState(null)
+    const navigate = useNavigate()
 
     // загружаем из localStorage при старте
     useEffect(() => {
@@ -18,7 +20,7 @@ const HeaderListEditable = ({ wordsCount = 0, isEditing, setIsEditing }) => {
 
     const handleSave = () => {
         localStorage.setItem('themeName', themeName)
-        setIsEditing(false)
+        setMode('view')
     }
 
     return (
@@ -31,7 +33,7 @@ const HeaderListEditable = ({ wordsCount = 0, isEditing, setIsEditing }) => {
                 <BackIcon />
             </Controls.Button>
 
-            {isEditing ? (
+            {mode === 'edit' ? (
                 <Controls.Input
                     value={themeName}
                     onChange={(e) => setThemeName(e.target.value)}
@@ -46,14 +48,19 @@ const HeaderListEditable = ({ wordsCount = 0, isEditing, setIsEditing }) => {
             )}
 
             <div className="header_buttons_wrapper">
-                {isEditing ? (
+                {mode === 'edit' && (
                     <Controls.Button variant="black_txt" onClick={handleSave}>
                         Сохранить
                     </Controls.Button>
-                ) : (
+                )}
+
+                {mode === 'view' && (
                     <Controls.Button
                         variant="black_txt"
-                        onClick={() => console.log('Тренировать')}
+                        onClick={() => {
+                            setMode('training')
+                            navigate('/training')
+                        }}
                     >
                         Тренировать
                     </Controls.Button>
@@ -73,38 +80,55 @@ const HeaderListEditable = ({ wordsCount = 0, isEditing, setIsEditing }) => {
                     <MenuIcon />
                 </Controls.Button>
             </div>
-            {isMenuOpen &&
-                (isEditing ? (
-                    <Controls.Menu
-                        position={menuPosition}
-                        items={[
-                            {
-                                label: 'Тренировать',
-                                onClick: () => setIsEditing(false),
-                            },
-                            {
-                                label: 'Удалить',
-                                onClick: () => console.log('Удалить тему'),
-                            },
-                        ]}
-                        onClose={() => setIsMenuOpen(false)}
-                    />
-                ) : (
-                    <Controls.Menu
-                        position={menuPosition}
-                        items={[
-                            {
-                                label: 'Редактировать',
-                                onClick: () => setIsEditing(true),
-                            },
-                            {
-                                label: 'Удалить',
-                                onClick: () => console.log('Удалить тему'),
-                            },
-                        ]}
-                        onClose={() => setIsMenuOpen(false)}
-                    />
-                ))}
+
+            {isMenuOpen && (
+                <Controls.Menu
+                    position={menuPosition}
+                    items={
+                        mode === 'edit'
+                            ? [
+                                  {
+                                      label: 'Просмотр слов',
+                                      onClick: () => {
+                                          setMode('view')
+                                          navigate('/collection')
+                                      },
+                                  },
+                                  {
+                                      label: 'Удалить тему',
+                                      onClick: () =>
+                                          console.log('Удалить тему'),
+                                  },
+                              ]
+                            : mode === 'training'
+                            ? [
+                                  {
+                                      label: 'Редактировать',
+                                      onClick: () => setMode('edit'),
+                                  },
+                                  {
+                                      label: 'Просмотр слов',
+                                      onClick: () => setMode('view'),
+                                  },
+                              ]
+                            : [
+                                  {
+                                      label: 'Редактировать',
+                                      onClick: () => {
+                                          setMode('edit')
+                                          navigate('/collection')
+                                      },
+                                  },
+                                  {
+                                      label: 'Удалить тему',
+                                      onClick: () =>
+                                          console.log('Удалить тему'),
+                                  },
+                              ]
+                    }
+                    onClose={() => setIsMenuOpen(false)}
+                />
+            )}
         </div>
     )
 }

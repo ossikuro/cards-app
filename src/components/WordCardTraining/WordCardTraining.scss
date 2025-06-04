@@ -1,0 +1,45 @@
+@use '../../style/DesignSystem_basic' as *;
+
+.wordCardTraining_wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 30rem;
+    height: 35rem;
+    padding: 1.5rem;
+    gap: 1.5rem;
+    background-color: $white_100;
+    border-radius: calc($radius_card * 2);
+    box-shadow: 0 1rem 2rem -0.5rem $black_06;
+}
+
+.wordCardTraining_word_wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+}
+
+.wordCardTraining_translation_wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.wordCardTraining_word {
+    color: $black_100;
+    font: $title_48;
+    text-align: center;
+}
+
+.wordCardTraining_transcription {
+    color: $black_48;
+    font: $body_24;
+    text-align: center;
+}
+
+.wordCardTraining_translation {
+    color: $black_100;
+    font: $title_32;
+    text-align: center;
+}

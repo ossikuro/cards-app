@@ -28,3 +28,18 @@
 .card_wrapper.no-translation {
     opacity: 0.32;
 }
+
+.card_column {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 0.125rem;
+    width: 100%;
+    font: $body_16;
+    color: $black_64;
+}
+
+.card_word {
+    font: $title_24;
+    color: $black_100;
+}
