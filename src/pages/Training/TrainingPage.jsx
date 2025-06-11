@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import HeaderTheme from '../../components/HeaderTheme/HeaderTheme'
 import WordListTraining from '../../components/WordListTraining/WordListTraining'
+import './TrainingPage.scss'
+import emptyImage from '../../assets/emptyImage.png'
 
 const TrainingPage = ({ mode, setMode }) => {
     const navigate = useNavigate()
@@ -32,7 +34,16 @@ const TrainingPage = ({ mode, setMode }) => {
             {words.length > 0 ? (
                 <WordListTraining words={words} />
             ) : (
-                <p className="training_empty">Нет слов для тренировки</p>
+                <div className="training_empty">
+                    <img
+                        src={emptyImage}
+                        alt="Поздравляем, ты всё выучил!"
+                        className="training_empty_image"
+                    />
+                    <p className="training_empty_text">
+                        Здесь просто нет слов 🥱
+                    </p>
+                </div>
             )}
         </>
     )
