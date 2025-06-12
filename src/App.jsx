@@ -8,7 +8,10 @@ import './style/normalize.css'
 
 const App = () => {
     // 🎯 Общий режим: 'view' | 'edit' | 'training'
-    const [mode, setMode] = useState('view')
+    const [mode, setMode] = useState(() => {
+        if (window.location.pathname === '/training') return 'training'
+        return 'view'
+    })
 
     return (
         <Routes>

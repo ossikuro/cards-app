@@ -20,6 +20,10 @@ const TrainingPage = ({ mode, setMode }) => {
         setWords(filtered)
     }, [])
 
+    useEffect(() => {
+        setMode('training')
+    }, [setMode])
+
     return (
         <>
             <HeaderTheme
