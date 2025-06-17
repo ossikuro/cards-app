@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import EditThemePage from './pages/EditTheme/EditThemePage.jsx'
+import HomePage from './pages/Home/HomePage.jsx'
 import TrainingPage from './pages/Training/TrainingPage.jsx'
+import Collection from './pages/Collection/Collection.jsx'
 import './App.css'
 import './style/reset.css'
 import './style/normalize.css'
@@ -15,9 +16,11 @@ const App = () => {
 
     return (
         <Routes>
+            <Route path="/" element={<Home mode={mode} setMode={setMode} />} />
+
             <Route
                 path="/collection"
-                element={<EditThemePage mode={mode} setMode={setMode} />}
+                element={<Collection mode={mode} setMode={setMode} />}
             />
             <Route
                 path="/training"
