@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import Controls from '../../components/Controls/index.jsx'
 import Header from '../../components/Header/Header.jsx'
 import WordListTraining from '../../components/WordListTraining/WordListTraining'
@@ -9,23 +10,25 @@ import emptyImage from '../../assets/emptyImage.png'
 
 const TrainingPage = ({ mode, setMode }) => {
     const navigate = useNavigate()
-    const [words, setWords] = useState([])
-    const [themeName, setThemeName] = useState('Список слов')
 
-    useEffect(() => {
-        const stored = localStorage.getItem('words')
-        if (!stored) return
+    const activeThemeId = useSelector((state) => state.themes.activeThemeId)
+    const activeTheme = useSelector((state) =>
+        state.themesStore.themes.find((t) => t.id === activeThemeId)
+    )
 
-        const parsed = JSON.parse(stored)
-        const filtered = parsed.filter(
-            (item) => item?.word?.trim() && item?.translation?.trim()
-        )
-        setWords(filtered)
-    }, [])
+    const allWords = activeTheme?.words || []
+    const themeName = activeTheme?.name || 'Без названия'
 
     useEffect(() => {
         setMode('training')
     }, [setMode])
+
+    const words = allWords.filter((item) => {
+        if (!item) return false
+        if (!item.word || item.word.trim() === '') return false
+        if (!item.translation || item.translation.trim() === '') return false
+        return true
+    })
 
     return (
         <>
