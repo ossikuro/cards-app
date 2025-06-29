@@ -2,8 +2,16 @@ import { useState } from 'react'
 import Controls from '../Controls'
 import './WordCardTraining.scss'
 
-const WordCardTraining = ({ data = {}, onChange }) => {
+const WordCardTraining = ({ data = {}, onReveal }) => {
     const [showTranslation, setShowTranslation] = useState(false)
+    const [hasRevealed, setHasRevealed] = useState(false)
+    const handleClick = () => {
+        if (!hasRevealed) {
+            onReveal?.() // вызываем родителя один раз
+            setHasRevealed(true) // запоминаем, что уже показывали
+        }
+        setShowTranslation((prev) => !prev) // переключаем перевод
+    }
     return (
         <div className="wordCardTraining_wrapper">
             <div className="wordCardTraining_word_wrapper">
@@ -22,7 +30,7 @@ const WordCardTraining = ({ data = {}, onChange }) => {
             </div>
             <Controls.Button
                 variant="transparent_txt"
-                onClick={() => setShowTranslation(!showTranslation)}
+                onClick={() => handleClick()}
                 type="button"
                 aria-label={
                     showTranslation ? 'Скрыть перевод' : 'Показать перевод'

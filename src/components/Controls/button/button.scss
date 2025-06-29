@@ -13,6 +13,9 @@
     &:hover {
         outline: none;
     }
+    &:focus {
+        outline: $black_32;
+    }
 }
 
 @mixin txt_btn {

@@ -21,6 +21,8 @@ const TrainingPage = ({ mode, setMode }) => {
     const allWords = activeTheme?.words || []
     const themeName = activeTheme?.name || 'Без названия'
 
+    const [learnedCount, setLearnedCount] = useState(0)
+
     useEffect(() => {
         setMode('training')
     }, [setMode])
@@ -61,7 +63,7 @@ const TrainingPage = ({ mode, setMode }) => {
                 <div className="header_title_text">
                     {themeName}
                     <div className="header_title_wordsCounter">
-                        {words.length} слов
+                        {`Выучено ${learnedCount} слов из ${words.length}`}
                     </div>
                 </div>
                 <Controls.Button
@@ -76,7 +78,10 @@ const TrainingPage = ({ mode, setMode }) => {
             </Header>
 
             {words.length > 0 ? (
-                <WordListTraining words={words} />
+                <WordListTraining
+                    words={words}
+                    setLearnedCount={setLearnedCount}
+                />
             ) : (
                 <div className="training_empty">
                     <img
