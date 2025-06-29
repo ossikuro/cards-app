@@ -11,7 +11,9 @@ import emptyImage from '../../assets/emptyImage.png'
 const TrainingPage = ({ mode, setMode }) => {
     const navigate = useNavigate()
 
-    const activeThemeId = useSelector((state) => state.themes.activeThemeId)
+    const activeThemeId = useSelector(
+        (state) => state.themesStore.activeThemeId
+    )
     const activeTheme = useSelector((state) =>
         state.themesStore.themes.find((t) => t.id === activeThemeId)
     )
