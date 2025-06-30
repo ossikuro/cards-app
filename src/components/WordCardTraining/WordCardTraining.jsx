@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Controls from '../Controls'
 import './WordCardTraining.scss'
+import useAutoFocus from '../Hooks/autoFocus'
 
 const WordCardTraining = ({ data = {}, onReveal }) => {
     const [showTranslation, setShowTranslation] = useState(false)
@@ -12,6 +13,10 @@ const WordCardTraining = ({ data = {}, onReveal }) => {
         }
         setShowTranslation((prev) => !prev) // переключаем перевод
     }
+
+    const [autoRef, , isAutoFocused] = useAutoFocus(true)
+    console.log('🧪 isAutoFocused:', isAutoFocused)
+
     return (
         <div className="wordCardTraining_wrapper">
             <div className="wordCardTraining_word_wrapper">
@@ -31,6 +36,8 @@ const WordCardTraining = ({ data = {}, onReveal }) => {
             <Controls.Button
                 variant="transparent_txt"
                 onClick={() => handleClick()}
+                ref={autoRef}
+                className={isAutoFocused ? 'force-visible' : ''}
                 type="button"
                 aria-label={
                     showTranslation ? 'Скрыть перевод' : 'Показать перевод'

@@ -28,10 +28,6 @@ const WordListTraining = ({ words = [], setLearnedCount }) => {
         }
     }
 
-    useEffect(() => {
-        console.log('Счётчик обновился:', setLearnedCount)
-    }, [setLearnedCount])
-
     const isFinished = index >= words.length
     const visibleCards = words.slice(index, index + 3)
 

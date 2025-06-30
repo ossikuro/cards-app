@@ -14,7 +14,10 @@
         outline: none;
     }
     &:focus {
-        outline: $black_32;
+        outline: none;
+    }
+    &:focus-visible {
+        outline: 1px solid $black_32;
     }
 }
 
@@ -147,4 +150,8 @@
     &:disabled {
         opacity: 0.32;
     }
+}
+
+.force-visible {
+    outline: 1px solid $black_32;
 }
