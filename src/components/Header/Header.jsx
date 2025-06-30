@@ -1,7 +1,7 @@
 import Controls from '../Controls'
 import './Header.scss'
 
-const Header = ({ children, menuItems = 0 }) => {
+const Header = ({ children, menuItems = [] }) => {
     return (
         <div className="header_wrapper">
             {children}

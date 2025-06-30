@@ -10,6 +10,15 @@
     &:disabled {
         cursor: not-allowed;
     }
+    &:hover {
+        outline: none;
+    }
+    &:focus {
+        outline: none;
+    }
+    &:focus-visible {
+        outline: 1px solid $black_32;
+    }
 }
 
 @mixin txt_btn {
@@ -141,4 +150,8 @@
     &:disabled {
         opacity: 0.32;
     }
+}
+
+.force-visible {
+    outline: 1px solid $black_32;
 }

@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Controls from '../Controls'
 import WordCardTraining from '../WordCardTraining/WordCardTraining'
 import victoryImage from '../../assets/victoryImage.png'
 import './WordListTraining.scss'
 
-const WordListTraining = ({ words = [] }) => {
+const WordListTraining = ({ words = [], setLearnedCount }) => {
     const [index, setIndex] = useState(0)
 
     const next = () => {
@@ -16,6 +16,15 @@ const WordListTraining = ({ words = [] }) => {
     const prev = () => {
         if (index > 0) {
             setIndex(index - 1)
+        }
+    }
+
+    const [revealedWordIds, setRevealedWordIds] = useState([])
+
+    const handleReveal = (id) => {
+        if (!revealedWordIds.includes(id)) {
+            setRevealedWordIds((revealWords) => [...revealWords, id])
+            setLearnedCount((revealWordsNum) => revealWordsNum + 1)
         }
     }
 
@@ -32,7 +41,10 @@ const WordListTraining = ({ words = [] }) => {
                             className={`card_layer card_layer--${i}`}
                             style={{ zIndex: 3 - i }}
                         >
-                            <WordCardTraining data={word} />
+                            <WordCardTraining
+                                data={word}
+                                onReveal={() => handleReveal(word.id)}
+                            />
                         </div>
                     ))
                 ) : (

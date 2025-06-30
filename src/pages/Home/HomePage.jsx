@@ -1,17 +1,28 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Header from '../../components/Header/Header'
+import { useSelector, useDispatch } from 'react-redux'
+
+import { addTheme } from '../../store/themeSlice'
+import Controls from '../../components/Controls'
+import ThemeList from '../../components/ThemeList/ThemeList.jsx'
 
 const HomePage = () => {
-    const navigate = useNavigate()
-    const [collections, useCollections] = useState([])
-    const [isEmpty, setIsEmpty] = useState(false)
+    const themes = useSelector((state) => state.themesStore.themes)
+    const dispatch = useDispatch()
+
+    const handleAddTheme = () => {
+        dispatch(addTheme('Новая тема'))
+    }
 
     return (
-        <>
-            <Header></Header>
-        </>
+        <div className="home_page_wrapper">
+            <h1 className="home_page_title">Темы для изучения</h1>
+
+            <Controls.Button variant="black_txt" onClick={handleAddTheme}>
+                Добавить тему
+            </Controls.Button>
+
+            <ThemeList themes={themes} />
+        </div>
     )
 }
 
-// export default HomePage
+export default HomePage

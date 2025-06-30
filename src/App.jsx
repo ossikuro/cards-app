@@ -8,7 +8,6 @@ import './style/reset.css'
 import './style/normalize.css'
 
 const App = () => {
-    // 🎯 Общий режим: 'view' | 'edit' | 'training'
     const [mode, setMode] = useState(() => {
         if (window.location.pathname === '/training') return 'training'
         return 'view'
@@ -16,8 +15,7 @@ const App = () => {
 
     return (
         <Routes>
-            <Route path="/" element={<Home mode={mode} setMode={setMode} />} />
-
+            <Route path="/" element={<HomePage />} />
             <Route
                 path="/collection"
                 element={<Collection mode={mode} setMode={setMode} />}
