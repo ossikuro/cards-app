@@ -18,7 +18,7 @@ const Button = forwardRef(
         } ${className}`
         return (
             <button ref={ref} className={finalClass} {...rest}>
-                {icon && <span className="icon">{icon}</span>}
+                {icon && <div className="icon">{icon}</div>}
                 {children}
             </button>
         )

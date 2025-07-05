@@ -5,8 +5,27 @@
     width: 100%;
 }
 
-//.EditThemePage {}
-
 .EditThemePage_ContentWrapper {
     padding: 3rem 1.5rem;
+}
+
+.collection_empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - (11.5rem + 1.5rem));
+    padding: 0 1.5rem;
+
+    &_image {
+        width: 16rem;
+        height: auto;
+        margin-bottom: 1.5rem;
+    }
+
+    &_text {
+        color: $white_100;
+        font: $title_32;
+        text-align: center;
+    }
 }

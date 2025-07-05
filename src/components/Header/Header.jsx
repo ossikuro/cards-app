@@ -5,7 +5,7 @@ const Header = ({ children, menuItems = [] }) => {
     return (
         <div className="header_wrapper">
             {children}
-            <Controls.Menu items={menuItems} />
+            {menuItems.length > 0 && <Controls.Menu items={menuItems} />}
         </div>
     )
 }

@@ -11,6 +11,7 @@ import {
     deleteTheme,
     setWords,
 } from '../../store/themeSlice'
+import emptyImage from '../../assets/emptyImage.png'
 import './Collection.scss'
 
 const Collection = ({ mode, setMode }) => {
@@ -63,7 +64,10 @@ const Collection = ({ mode, setMode }) => {
                     <Controls.Button
                         variant="transparent_icon"
                         aria-label="Назад"
-                        onClick={() => navigate(-1)}
+                        onClick={() => {
+                            navigate('/collection')
+                            setMode('view')
+                        }}
                         icon={<BackButton />}
                     />
 
@@ -99,7 +103,7 @@ const Collection = ({ mode, setMode }) => {
                     <Controls.Button
                         variant="transparent_icon"
                         aria-label="Назад"
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate('/')}
                         icon={<BackButton />}
                     />
 
@@ -123,11 +127,30 @@ const Collection = ({ mode, setMode }) => {
             )}
 
             <div className="EditThemePage_ContentWrapper">
-                <WordListEditable
-                    words={words}
-                    setWords={(newWords) => dispatch(setWords(newWords))}
-                    mode={mode}
-                />
+                {words.length > 0 ? (
+                    <WordListEditable
+                        words={words}
+                        setWords={(newWords) => dispatch(setWords(newWords))}
+                        mode={mode}
+                    />
+                ) : mode === 'view' ? (
+                    <div className="collection_empty">
+                        <img
+                            src={emptyImage}
+                            alt="Нет слов"
+                            className="collection_empty_image"
+                        />
+                        <p className="collection_empty_text">
+                            Здесь пока нет слов 🙈
+                        </p>
+                    </div>
+                ) : (
+                    <WordListEditable
+                        words={words}
+                        setWords={(newWords) => dispatch(setWords(newWords))}
+                        mode={mode}
+                    />
+                )}
             </div>
         </div>
     )

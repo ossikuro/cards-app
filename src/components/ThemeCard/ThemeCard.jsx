@@ -5,7 +5,7 @@ import Controls from '../Controls/index.jsx'
 import './ThemeCard.scss'
 import { setActiveTheme } from '../../store/themeSlice.js'
 
-const ThemeCard = ({ theme }) => {
+const ThemeCard = ({ theme, menuItems = [] }) => {
     const allWords = theme.words || []
     const themeName = theme.name || 'Без названия'
 
@@ -37,6 +37,7 @@ const ThemeCard = ({ theme }) => {
                 >
                     Просмотр слов
                 </Controls.Button>
+                <Controls.Menu items={menuItems} />
             </div>
         </div>
     )
