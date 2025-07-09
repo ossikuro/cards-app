@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import HomePage from './pages/Home/HomePage.jsx'
 import TrainingPage from './pages/Training/TrainingPage.jsx'
 import Collection from './pages/Collection/Collection.jsx'
+import NotFound from './pages/NotFound/NotFound.jsx'
 import './App.css'
 import './style/reset.css'
 import './style/normalize.css'
@@ -24,6 +25,7 @@ const App = () => {
                 path="/training"
                 element={<TrainingPage mode={mode} setMode={setMode} />}
             />
+            <Route path="*" element={<NotFound />} />
         </Routes>
     )
 }

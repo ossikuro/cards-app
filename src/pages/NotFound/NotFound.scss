@@ -1,0 +1,35 @@
+@use '../../style/DesignSystem_basic' as *;
+#root {
+    background: $blue_bg;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.page_empty {
+    padding: 3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - (11.5rem + 1.5rem));
+}
+
+.page_empty_image {
+    padding: 0 0 0.5rem 0;
+    font: $title_24;
+    color: $white_100;
+    width: 16rem;
+    height: auto;
+    margin-bottom: 1.5rem;
+}
+
+.logo {
+    height: 4rem;
+    width: auto;
+}
+
+.page_empty_text {
+    color: $white_100;
+    font: $title_32;
+    text-align: center;
+}

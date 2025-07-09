@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import ThemeList from '../../components/ThemeList/ThemeList.jsx'
@@ -13,14 +14,13 @@ const HomePage = () => {
     return (
         <>
             <Header>
-                <a>
+                <Link to="/">
                     <img className="logo" src={logo} alt="Логотип" />
-                </a>
+                </Link>
             </Header>
             <div className="home_page_wrapper">
                 <h1 className="home_page_title">Темы для изучения</h1>
-                <ThemeList themes={themes} setMode={setMode} />{' '}
-                {/* 👈 пробрасываем */}
+                <ThemeList themes={themes} setMode={setMode} />
             </div>
         </>
     )
