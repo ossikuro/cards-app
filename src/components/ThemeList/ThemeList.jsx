@@ -35,6 +35,7 @@ const ThemeList = ({ themes = [], setMode }) => {
         const finalName = count === 1 ? baseName : `${baseName} (${count})`
 
         dispatch(addTheme(finalName))
+        console.log('Добавлена тема:', finalName)
     }
 
     return (

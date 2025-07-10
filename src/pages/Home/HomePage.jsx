@@ -1,10 +1,12 @@
 //хуки
+import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 //компоненты
 import ThemeList from '../../components/ThemeList/ThemeList.jsx'
 import Header from '../../components/Header/Header.jsx'
 //редьюсеры
+import { loadWordsFromServer } from '../../store/themeSlice'
 import { setScreenState } from '../../store/themeScreenSlice'
 //картинки, иконки, стили
 import logo from '../../assets/logo.png'
@@ -13,8 +15,11 @@ import './HomePage.scss'
 const HomePage = () => {
     const dispatch = useDispatch()
 
-    const themes = useSelector((state) => state.themesStore.themes)
+    useEffect(() => {
+        dispatch(loadWordsFromServer()) // ✅ это вызовет загрузку и setFetchedThemes
+    }, [])
 
+    const themes = useSelector((state) => state.themesStore.themes)
     const mode = useSelector((state) => state.screenState.screenState)
 
     return (

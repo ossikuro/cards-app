@@ -11,8 +11,8 @@ const ThemeCard = ({ theme, menuItems = [] }) => {
 
     const wordsToTrain = allWords.filter((item) => {
         if (!item) return false
-        if (!item.word || item.word.trim() === '') return false
-        if (!item.translation || item.translation.trim() === '') return false
+        if (!item.english || item.english.trim() === '') return false
+        if (!item.russian || item.russian.trim() === '') return false
         return true
     })
 
@@ -24,7 +24,7 @@ const ThemeCard = ({ theme, menuItems = [] }) => {
             <div className="theme_name_wrapper">
                 <div className="card_name">{theme.name}</div>
                 <div className="card_number">
-                    Тренировать: {allWords.length} из {wordsToTrain.length}
+                    Тренировать: {wordsToTrain.length} из {allWords.length}
                 </div>
             </div>
             <div className="theme_card_buttons">

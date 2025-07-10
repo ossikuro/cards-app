@@ -37,9 +37,9 @@ const WordList = () => {
         ) {
             const emptyWords = Array.from({ length: 3 }, () => ({
                 id: crypto.randomUUID(),
-                word: '',
+                english: '',
                 transcription: '',
-                translation: '',
+                russian: '',
             }))
             emptyWords.forEach((word) => dispatch(addWord(word)))
             addedInitialWords.current = true // поднимаем флажок - запрет на добавление слов
@@ -50,7 +50,7 @@ const WordList = () => {
     useEffect(() => {
         if (mode !== 'edit') {
             const filtered = words.filter(
-                (w) => w.word.trim() || w.translation.trim()
+                (w) => w.english.trim() || w.russian.trim()
             )
 
             const isDifferent =
@@ -67,14 +67,23 @@ const WordList = () => {
         dispatch(deleteWord(id))
     }
 
+    const theme = useSelector((state) =>
+        state.themesStore.themes.find(
+            (t) => t.id === state.themesStore.activeThemeId
+        )
+    )
+
     const handleAddWord = () => {
         const newWord = {
             id: crypto.randomUUID(),
-            word: '',
+            english: '',
             transcription: '',
-            translation: '',
+            russian: '',
+            tags: theme?.tag || '',
+            tags_json: '',
         }
         dispatch(addWord(newWord))
+        console.log('Добавлено слово:', newWord) // 👈 сюда
     }
 
     const handleChange = (id, newData) => {

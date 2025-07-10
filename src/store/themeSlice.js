@@ -1,24 +1,91 @@
-import { createSlice, nanoid } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, nanoid } from '@reduxjs/toolkit'
 
 const initialState = {
     themes: [
         {
             id: nanoid(),
             name: 'Список слов',
+            tags: '',
+            tags_json: '',
             words: [],
         },
     ],
     activeThemeId: null,
 }
 
+const loadWordsFromServer = () => async (dispatch) => {
+    try {
+        const response = await fetch(
+            'http://itgirlschool.justmakeit.ru/api/words'
+        )
+        const data = await response.json()
+
+        const themesMap = {}
+
+        data.forEach((word) => {
+            const tags = word.tags
+            if (!themesMap[tags]) {
+                themesMap[tags] = []
+            }
+            themesMap[tags].push(word)
+        })
+        const groupedThemes = Object.entries(themesMap).map(
+            ([tags, words]) => ({
+                id: nanoid(),
+                name: tags || 'Без названия',
+                tags: tags,
+                tags_json: '', // если хочешь позже использовать — пусть будет
+                words: words,
+            })
+        )
+
+        dispatch(setFetchedThemes(groupedThemes))
+    } catch (error) {
+        console.error('Ошибка загрузки слов с сервера:', error)
+    }
+}
+
+const saveWordsToServer = (words) => async (dispatch) => {
+    try {
+        const response = await fetch(
+            'http://itgirlschool.justmakeit.ru/api/words/add',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(words),
+            }
+        )
+
+        if (!response.ok) {
+            throw new Error(`Ошибка: ${response.status}`)
+        }
+
+        const result = await response.json()
+        console.log('✅ Успешно отправлено на сервер:', result)
+    } catch (error) {
+        console.error('❌ Ошибка при отправке на сервер:', error)
+    }
+}
+
 const themeSlice = createSlice({
     name: 'themesStore',
     initialState,
     reducers: {
+        setFetchedThemes: (state, action) => {
+            state.themes = action.payload
+            if (!state.activeThemeId && action.payload.length > 0) {
+                state.activeThemeId = action.payload[0].id
+            }
+        },
         addTheme: (state, action) => {
+            const tags = action.payload
             state.themes.push({
                 id: nanoid(),
-                name: action.payload,
+                name: tags,
+                tags: tags,
+                tags_json: '', // ⬅ оставляем пустым
                 words: [],
             })
         },
@@ -35,6 +102,7 @@ const themeSlice = createSlice({
             const theme = state.themes.find((t) => t.id === state.activeThemeId)
             if (theme) {
                 theme.name = action.payload.name
+                theme.tags = action.payload.name // 👈 синхронизируем с name
             }
         },
         setWords: (state, action) => {
@@ -46,7 +114,12 @@ const themeSlice = createSlice({
         addWord: (state, action) => {
             const theme = state.themes.find((t) => t.id === state.activeThemeId)
             if (theme) {
-                theme.words.push(action.payload)
+                const wordWithTag = {
+                    ...action.payload,
+                    tags: theme.tags,
+                    tags_json: '',
+                }
+                theme.words.push(wordWithTag)
             }
         },
         updateWord: (state, action) => {
@@ -77,6 +150,9 @@ export const {
     addWord,
     updateWord,
     deleteWord,
+    setFetchedThemes,
 } = themeSlice.actions
+
+export { loadWordsFromServer, saveWordsToServer }
 
 export default themeSlice.reducer

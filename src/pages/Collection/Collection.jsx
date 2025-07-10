@@ -1,20 +1,21 @@
-//хуки
-import { useEffect } from 'react'
+// хуки
+import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-//компоненты
+// компоненты
 import WordList from '../../components/WordList/WordList.jsx'
 import Controls from '../../components/Controls'
 import Header from '../../components/Header/Header.jsx'
-//редьюсеры
+// редьюсеры
 import {
     setActiveTheme,
     renameTheme,
     deleteTheme,
     setWords,
+    saveWordsToServer,
 } from '../../store/themeSlice'
 import { setScreenState } from '../../store/themeScreenSlice'
-//картинки, иконки, стили
+// стили и картинки
 import BackButton from '../../assets/icons/chevron_left.svg?react'
 import emptyImage from '../../assets/emptyImage.png'
 import './Collection.scss'
@@ -24,14 +25,17 @@ const Collection = () => {
     const navigate = useNavigate()
 
     const mode = useSelector((state) => state.screenState.screenState)
-    const activeThemeId = useSelector((state) => {
-        return state.themesStore.activeThemeId
-    })
+    const themes = useSelector((state) => state.themesStore.themes)
+    const activeThemeId = useSelector(
+        (state) => state.themesStore.activeThemeId
+    )
     const activeTheme = useSelector((state) =>
         state.themesStore.themes.find((t) => t.id === activeThemeId)
     )
+    const words = activeTheme?.words || []
 
-    const themes = useSelector((state) => state.themesStore.themes)
+    // 🔧 состояние для редактирования названия
+    const [localName, setLocalName] = useState(activeTheme?.name || '')
 
     useEffect(() => {
         if (!activeThemeId && themes.length > 0) {
@@ -39,8 +43,11 @@ const Collection = () => {
         }
     }, [activeThemeId, themes, dispatch])
 
-    const words = activeTheme?.words || []
-    const themeName = activeTheme?.name || 'Без названия'
+    useEffect(() => {
+        if (activeTheme) {
+            setLocalName(activeTheme.name)
+        }
+    }, [activeTheme])
 
     const handleDelete = () => {
         dispatch(deleteTheme(activeThemeId))
@@ -48,8 +55,31 @@ const Collection = () => {
     }
 
     const handleSave = () => {
-        dispatch(renameTheme({ id: activeThemeId, name: themeName }))
+        dispatch(renameTheme({ id: activeThemeId, name: localName }))
         dispatch(setScreenState('view'))
+
+        if (!activeTheme) {
+            console.warn('Нет активной темы')
+            return
+        }
+
+        const preparedWords = activeTheme.words
+            .filter((word) => word.english.trim() && word.russian.trim())
+            .map(({ english, transcription, russian, tags, tags_json }) => ({
+                english: english.trim(),
+                transcription: transcription.trim(),
+                russian: russian.trim(),
+                tags: localName.trim(),
+                tags_json: '',
+            }))
+        console.log('🎯 preparedWords', preparedWords)
+        console.log(
+            '📦 JSON.stringify:',
+            JSON.stringify(preparedWords, null, 2)
+        )
+
+        console.log('Отправляем на сервер:', preparedWords)
+        dispatch(saveWordsToServer(preparedWords))
     }
 
     return (
@@ -78,15 +108,8 @@ const Collection = () => {
                     />
 
                     <Controls.Input
-                        value={themeName}
-                        onChange={(e) =>
-                            dispatch(
-                                renameTheme({
-                                    id: activeThemeId,
-                                    name: e.target.value,
-                                })
-                            )
-                        }
+                        value={localName}
+                        onChange={(e) => setLocalName(e.target.value)}
                     />
 
                     <Controls.Button variant="black_txt" onClick={handleSave}>
@@ -114,7 +137,7 @@ const Collection = () => {
                     />
 
                     <div className="header_title_text">
-                        {themeName}
+                        {activeTheme?.name || 'Без названия'}
                         <div className="header_title_wordsCounter">
                             {words.length} слов
                         </div>
