@@ -1,19 +1,24 @@
+//хуки
+import { useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useEffect } from 'react'
+//компоненты
 import WordCardEditable from '../WordCardEditable/WordCardEditable'
 import WordCard from '../WordCard/WordCard'
 import AddWordButton from '../WordAddNew/WordAddNew'
+//редьюсеры
 import {
     addWord,
     deleteWord,
     updateWord,
     setWords,
 } from '../../store/themeSlice'
-import './WordListEditable.scss'
+//картинки, иконки, стили
+import './WordList.scss'
 
-const WordListEditable = ({ mode }) => {
+const WordList = () => {
     const dispatch = useDispatch()
 
+    const mode = useSelector((state) => state.screenState.screenState)
     const words = useSelector((state) => {
         const activeTheme = state.themesStore.themes.find(
             (t) => t.id === state.themesStore.activeThemeId
@@ -21,9 +26,15 @@ const WordListEditable = ({ mode }) => {
         return activeTheme?.words || []
     })
 
-    // Добавляем 3 пустых слова, если список пуст
+    const addedInitialWords = useRef(false)
+
+    //добавляем 3 пустые карточки, если  статус страницы редактирование + массив пустой + нет флажка больше не добавлять
     useEffect(() => {
-        if (mode === 'edit' && words.length === 0) {
+        if (
+            mode === 'edit' &&
+            words.length === 0 &&
+            !addedInitialWords.current
+        ) {
             const emptyWords = Array.from({ length: 3 }, () => ({
                 id: crypto.randomUUID(),
                 word: '',
@@ -31,6 +42,7 @@ const WordListEditable = ({ mode }) => {
                 translation: '',
             }))
             emptyWords.forEach((word) => dispatch(addWord(word)))
+            addedInitialWords.current = true // поднимаем флажок - запрет на добавление слов
         }
     }, [mode, words.length, dispatch])
 
@@ -92,4 +104,4 @@ const WordListEditable = ({ mode }) => {
     )
 }
 
-export default WordListEditable
+export default WordList

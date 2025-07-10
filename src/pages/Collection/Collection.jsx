@@ -1,23 +1,29 @@
+//хуки
 import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import WordListEditable from '../../components/WordList/WordListEditable.jsx'
+//компоненты
+import WordList from '../../components/WordList/WordList.jsx'
 import Controls from '../../components/Controls'
 import Header from '../../components/Header/Header.jsx'
-import BackButton from '../../assets/icons/chevron_left.svg?react'
+//редьюсеры
 import {
     setActiveTheme,
     renameTheme,
     deleteTheme,
     setWords,
 } from '../../store/themeSlice'
+import { setScreenState } from '../../store/themeScreenSlice'
+//картинки, иконки, стили
+import BackButton from '../../assets/icons/chevron_left.svg?react'
 import emptyImage from '../../assets/emptyImage.png'
 import './Collection.scss'
 
-const Collection = ({ mode, setMode }) => {
+const Collection = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
+    const mode = useSelector((state) => state.screenState.screenState)
     const activeThemeId = useSelector((state) => {
         return state.themesStore.activeThemeId
     })
@@ -43,7 +49,7 @@ const Collection = ({ mode, setMode }) => {
 
     const handleSave = () => {
         dispatch(renameTheme({ id: activeThemeId, name: themeName }))
-        setMode('view')
+        dispatch(setScreenState('view'))
     }
 
     return (
@@ -53,7 +59,7 @@ const Collection = ({ mode, setMode }) => {
                     menuItems={[
                         {
                             label: 'Просмотр слов',
-                            onClick: () => setMode('view'),
+                            onClick: () => dispatch(setScreenState('view')),
                         },
                         {
                             label: 'Удалить тему',
@@ -66,7 +72,7 @@ const Collection = ({ mode, setMode }) => {
                         aria-label="Назад"
                         onClick={() => {
                             navigate('/collection')
-                            setMode('view')
+                            dispatch(setScreenState('view'))
                         }}
                         icon={<BackButton />}
                     />
@@ -92,7 +98,7 @@ const Collection = ({ mode, setMode }) => {
                     menuItems={[
                         {
                             label: 'Редактировать',
-                            onClick: () => setMode('edit'),
+                            onClick: () => dispatch(setScreenState('edit')),
                         },
                         {
                             label: 'Удалить тему',
@@ -117,7 +123,7 @@ const Collection = ({ mode, setMode }) => {
                     <Controls.Button
                         variant="black_txt"
                         onClick={() => {
-                            setMode('training')
+                            dispatch(setScreenState('training'))
                             navigate('/training')
                         }}
                     >
@@ -127,13 +133,7 @@ const Collection = ({ mode, setMode }) => {
             )}
 
             <div className="EditThemePage_ContentWrapper">
-                {words.length > 0 ? (
-                    <WordListEditable
-                        words={words}
-                        setWords={(newWords) => dispatch(setWords(newWords))}
-                        mode={mode}
-                    />
-                ) : mode === 'view' ? (
+                {mode === 'view' && words.length === 0 ? (
                     <div className="collection_empty">
                         <img
                             src={emptyImage}
@@ -145,11 +145,7 @@ const Collection = ({ mode, setMode }) => {
                         </p>
                     </div>
                 ) : (
-                    <WordListEditable
-                        words={words}
-                        setWords={(newWords) => dispatch(setWords(newWords))}
-                        mode={mode}
-                    />
+                    <WordList />
                 )}
             </div>
         </div>
