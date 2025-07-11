@@ -1,40 +1,41 @@
-import { useEffect, useState } from 'react'
+import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
-import Controls from '../Controls/index.jsx'
+
+import { WordsContext } from '../../store/wordsContext.jsx'
+import Controls from '../Controls'
 import './ThemeCard.scss'
-import { setActiveTheme } from '../../store/themeSlice.js'
 
 const ThemeCard = ({ theme, menuItems = [] }) => {
-    const allWords = theme.words || []
-    const themeName = theme.name || 'Без названия'
-
-    const wordsToTrain = allWords.filter((item) => {
-        if (!item) return false
-        if (!item.word || item.word.trim() === '') return false
-        if (!item.translation || item.translation.trim() === '') return false
-        return true
-    })
-
-    const dispatch = useDispatch()
+    const { words, setActiveTag, setMode } = useContext(WordsContext)
     const navigate = useNavigate()
+
+    // Слова, привязанные к этой теме
+    const allWords = words.filter((word) => word.tags.includes(theme.id))
+
+    // Слова, готовые к тренировке
+    const wordsToTrain = allWords.filter(
+        (item) => item.word?.trim() && item.translation?.trim()
+    )
+
+    // Имя темы: используем как есть, если задано, иначе показываем "Новая тема"
+    const themeName = theme.name?.trim() || 'Новая тема'
+
+    const handleView = () => {
+        setActiveTag(theme.id)
+        setMode('view')
+        navigate('/collection')
+    }
 
     return (
         <div className="theme_card_wrapper">
             <div className="theme_name_wrapper">
-                <div className="card_name">{theme.name}</div>
+                <div className="card_name">{themeName}</div>
                 <div className="card_number">
-                    Тренировать: {allWords.length} из {wordsToTrain.length}
+                    Тренировать: {wordsToTrain.length} из {allWords.length}
                 </div>
             </div>
             <div className="theme_card_buttons">
-                <Controls.Button
-                    variant="black_txt"
-                    onClick={() => {
-                        dispatch(setActiveTheme(theme.id))
-                        navigate('/collection')
-                    }}
-                >
+                <Controls.Button variant="black_txt" onClick={handleView}>
                     Просмотр слов
                 </Controls.Button>
                 <Controls.Menu items={menuItems} />

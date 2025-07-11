@@ -1,21 +1,16 @@
-//хуки
-import { useSelector, useDispatch } from 'react-redux'
+import { useContext } from 'react'
 import { Link } from 'react-router-dom'
-//компоненты
+
+import { WordsContext } from '../../store/wordsContext.jsx'
+
 import ThemeList from '../../components/ThemeList/ThemeList.jsx'
 import Header from '../../components/Header/Header.jsx'
-//редьюсеры
-import { setScreenState } from '../../store/themeScreenSlice'
-//картинки, иконки, стили
+
 import logo from '../../assets/logo.png'
 import './HomePage.scss'
 
 const HomePage = () => {
-    const dispatch = useDispatch()
-
-    const themes = useSelector((state) => state.themesStore.themes)
-
-    const mode = useSelector((state) => state.screenState.screenState)
+    const { tags, mode, setMode } = useContext(WordsContext)
 
     return (
         <>
@@ -26,10 +21,7 @@ const HomePage = () => {
             </Header>
             <div className="home_page_wrapper">
                 <h1 className="home_page_title">Темы для изучения</h1>
-                <ThemeList
-                    themes={themes}
-                    setMode={(mode) => dispatch(setScreenState(mode))}
-                />
+                <ThemeList themes={tags} setMode={setMode} mode={mode} />
             </div>
         </>
     )

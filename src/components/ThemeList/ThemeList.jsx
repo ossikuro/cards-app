@@ -1,45 +1,48 @@
-import ThemeCard from '../ThemeCard/ThemeCard'
-import { addTheme, deleteTheme, setActiveTheme } from '../../store/themeSlice'
-import { useSelector, useDispatch } from 'react-redux'
+import { useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+
+import { WordsContext } from '../../store/wordsContext.jsx'
+import ThemeCard from '../ThemeCard/ThemeCard'
 import AddThemeButton from '../ThemeAddNew/ThemeAddNew'
 import './ThemeList.scss'
 
 const ThemeList = ({ themes = [], setMode }) => {
-    const dispatch = useDispatch()
+    const { tags, setTags, activeTag, setActiveTag } = useContext(WordsContext)
+
     const navigate = useNavigate()
-    const activeThemeId = useSelector(
-        (state) => state.themesStore.activeThemeId
-    )
 
     useEffect(() => {
-        if (!activeThemeId && themes.length > 0) {
-            dispatch(setActiveTheme(themes[0].id))
+        if (!activeTag && tags.length > 0) {
+            setActiveTag(tags[0].id)
         }
-    }, [activeThemeId, themes, dispatch])
+    }, [activeTag, tags, setActiveTag])
 
     const handleAddTheme = () => {
         const baseName = 'Новая тема'
+        const names = tags.map((t) => t.name)
+        const sameNames = names.filter((n) => n.startsWith(baseName))
 
-        // получаем все названия тем
-        const names = themes.map((t) => t.name)
+        const newTheme = {
+            id: Date.now().toString(),
+            name: sameNames.length
+                ? `${baseName} ${sameNames.length + 1}`
+                : baseName,
+            words: [],
+        }
 
-        // фильтруем те, что начинаются с 'Новая тема'
-        const sameNames = names.filter(
-            (name) => name === baseName || name.startsWith(`${baseName} (`)
-        )
+        setTags([...tags, newTheme])
+    }
 
-        // вычисляем следующий номер
-        const count = sameNames.length + 1
-        const finalName = count === 1 ? baseName : `${baseName} (${count})`
-
-        dispatch(addTheme(finalName))
+    const handleDeleteTheme = (id) => {
+        const confirmed = confirm('Удалить тему?')
+        if (confirmed) {
+            setTags(tags.filter((t) => t.id !== id))
+        }
     }
 
     return (
         <div className="theme_list_wrapper">
-            {themes.map((theme) => (
+            {tags.map((theme) => (
                 <ThemeCard
                     key={theme.id}
                     theme={theme}
@@ -47,14 +50,14 @@ const ThemeList = ({ themes = [], setMode }) => {
                         {
                             label: 'Редактировать',
                             onClick: () => {
-                                dispatch(setActiveTheme(theme.id))
+                                setActiveTag(theme.id)
                                 setMode('edit')
                                 navigate('/collection')
                             },
                         },
                         {
-                            label: 'Удалить тему',
-                            onClick: () => dispatch(deleteTheme(theme.id)),
+                            label: 'Удалить',
+                            onClick: () => handleDeleteTheme(theme.id),
                         },
                     ]}
                 />
