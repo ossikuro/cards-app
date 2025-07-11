@@ -1,56 +1,40 @@
 //хуки
-import { useEffect, useRef } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useEffect } from 'react'
+import { useContext } from 'react'
+//хранилка
+import { WordsContext } from '../../store/wordsContext'
 //компоненты
 import WordCardEditable from '../WordCardEditable/WordCardEditable'
 import WordCard from '../WordCard/WordCard'
 import AddWordButton from '../WordAddNew/WordAddNew'
-//редьюсеры
-import {
-    addWord,
-    deleteWord,
-    updateWord,
-    setWords,
-} from '../../store/themeSlice'
 //картинки, иконки, стили
 import './WordList.scss'
+import { AppContext } from '../../store/contextTrue'
 
-const WordList = () => {
-    const dispatch = useDispatch()
+const WordList = ({ themeName }) => {
+    const { words, setWords, mode, createEmptyWord } = useContext(WordsContext)
 
-    const mode = useSelector((state) => state.screenState.screenState)
-    const words = useSelector((state) => {
-        const activeTheme = state.themesStore.themes.find(
-            (t) => t.id === state.themesStore.activeThemeId
-        )
-        return activeTheme?.words || []
-    })
-
-    const addedInitialWords = useRef(false)
+    const {
+        words: targetWordsList,
+        addWord,
+        editWord,
+        deleteWord,
+    } = useContext(AppContext)
 
     //добавляем 3 пустые карточки, если  статус страницы редактирование + массив пустой + нет флажка больше не добавлять
     useEffect(() => {
-        if (
-            mode === 'edit' &&
-            words.length === 0 &&
-            !addedInitialWords.current
-        ) {
-            const emptyWords = Array.from({ length: 3 }, () => ({
-                id: crypto.randomUUID(),
-                word: '',
-                transcription: '',
-                translation: '',
-            }))
-            emptyWords.forEach((word) => dispatch(addWord(word)))
-            addedInitialWords.current = true // поднимаем флажок - запрет на добавление слов
+        if (mode === 'edit' && targetWordsList.length === 0) {
+            addWord(themeName)
+            addWord(themeName)
+            addWord(themeName)
         }
-    }, [mode, words.length, dispatch])
+    }, [mode, targetWordsList, themeName])
 
     // Очищаем пустые слова при выходе из edit
     useEffect(() => {
         if (mode !== 'edit') {
             const filtered = words.filter(
-                (w) => w.word.trim() || w.translation.trim()
+                (w) => w.english.trim() || w.russian.trim()
             )
 
             const isDifferent =
@@ -58,32 +42,30 @@ const WordList = () => {
                 filtered.some((w, i) => w.id !== words[i].id)
 
             if (isDifferent) {
-                dispatch(setWords(filtered))
+                setWords(filtered)
             }
         }
-    }, [mode, words, dispatch])
+    }, [mode, words])
 
     const handleDelete = (id) => {
-        dispatch(deleteWord(id))
+        deleteWord(id)
     }
 
     const handleAddWord = () => {
-        const newWord = {
-            id: crypto.randomUUID(),
-            word: '',
-            transcription: '',
-            translation: '',
-        }
-        dispatch(addWord(newWord))
+        addWord(themeName)
     }
 
+    useEffect(() => {
+        console.log(targetWordsList)
+    }, [targetWordsList])
+
     const handleChange = (id, newData) => {
-        dispatch(updateWord({ id, newWord: newData }))
+        editWord(id, newData)
     }
 
     return (
         <div className="word_list_wrapper">
-            {words.map((wordData, idx) =>
+            {targetWordsList.map((wordData, idx) =>
                 mode === 'edit' ? (
                     <WordCardEditable
                         key={wordData.id}

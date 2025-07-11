@@ -1,56 +1,83 @@
 //хуки
-import { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useEffect, useState } from 'react'
+import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+//хранилка
+import { WordsContext } from '../../store/wordsContext'
 //компоненты
 import WordList from '../../components/WordList/WordList.jsx'
 import Controls from '../../components/Controls'
 import Header from '../../components/Header/Header.jsx'
-//редьюсеры
-import {
-    setActiveTheme,
-    renameTheme,
-    deleteTheme,
-    setWords,
-} from '../../store/themeSlice'
-import { setScreenState } from '../../store/themeScreenSlice'
 //картинки, иконки, стили
 import BackButton from '../../assets/icons/chevron_left.svg?react'
 import emptyImage from '../../assets/emptyImage.png'
 import './Collection.scss'
 
 const Collection = () => {
-    const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const mode = useSelector((state) => state.screenState.screenState)
-    const activeThemeId = useSelector((state) => {
-        return state.themesStore.activeThemeId
-    })
-    const activeTheme = useSelector((state) =>
-        state.themesStore.themes.find((t) => t.id === activeThemeId)
+    const {
+        tags,
+        setTags,
+        activeTag,
+        setActiveTag,
+        setWords,
+        words,
+        setMode,
+        mode,
+    } = useContext(WordsContext)
+
+    /** автовыбор первой темы как активной */
+    useEffect(() => {
+        if (!activeTag && tags.length > 0) {
+            setActiveTag(tags[0])
+        }
+    }, [activeTag, tags])
+
+    // локальное состояние имени темы
+    const [themeName, setThemeName] = useState(activeTag || 'Без названия')
+    useEffect(() => {
+        setThemeName(activeTag || 'Без названия')
+    }, [activeTag])
+
+    // фильтрация слов по активной теме
+    const filteredWords = words.filter(
+        (word) =>
+            // либо tags совпадает
+            word.tags === activeTag ||
+            // либо, если tags не задан, смотрим на legacy-поле tag
+            word.tag === activeTag
     )
 
-    const themes = useSelector((state) => state.themesStore.themes)
-
-    useEffect(() => {
-        if (!activeThemeId && themes.length > 0) {
-            dispatch(setActiveTheme(themes[0].id))
-        }
-    }, [activeThemeId, themes, dispatch])
-
-    const words = activeTheme?.words || []
-    const themeName = activeTheme?.name || 'Без названия'
-
     const handleDelete = () => {
-        dispatch(deleteTheme(activeThemeId))
+        setTags((prev) => prev.filter((tag) => tag !== activeTag))
+        setWords((prev) => prev.filter((word) => word.tags !== activeTag))
+        setActiveTag(null)
         navigate('/')
     }
 
     const handleSave = () => {
-        dispatch(renameTheme({ id: activeThemeId, name: themeName }))
-        dispatch(setScreenState('view'))
+        console.log('Сохраняем тему:', activeTag, '→', themeName)
+        setTags((prev) =>
+            prev.map((tag) => (tag === activeTag ? themeName : tag))
+        )
+        setWords((prev) =>
+            prev.map((word) =>
+                word.tags === activeTag ? { ...word, tags: themeName } : word
+            )
+        )
+        setActiveTag(themeName) // обновляем активную тему
+        setMode('view')
     }
+
+    // Отладочный эффект: вывод состояния после изменений
+    useEffect(() => {
+        console.log('--- Отладка состояния ---')
+        console.log('activeTag:', activeTag)
+        console.log('themeName:', themeName)
+        console.log('words:', words)
+        console.log('filteredWords:', filteredWords)
+    }, [activeTag, themeName, words, filteredWords])
 
     return (
         <div className="Collection">
@@ -59,7 +86,7 @@ const Collection = () => {
                     menuItems={[
                         {
                             label: 'Просмотр слов',
-                            onClick: () => dispatch(setScreenState('view')),
+                            onClick: () => setMode('view'),
                         },
                         {
                             label: 'Удалить тему',
@@ -72,21 +99,14 @@ const Collection = () => {
                         aria-label="Назад"
                         onClick={() => {
                             navigate('/collection')
-                            dispatch(setScreenState('view'))
+                            setMode('view')
                         }}
                         icon={<BackButton />}
                     />
 
                     <Controls.Input
                         value={themeName}
-                        onChange={(e) =>
-                            dispatch(
-                                renameTheme({
-                                    id: activeThemeId,
-                                    name: e.target.value,
-                                })
-                            )
-                        }
+                        onChange={(e) => setThemeName(e.target.value)}
                     />
 
                     <Controls.Button variant="black_txt" onClick={handleSave}>
@@ -98,7 +118,7 @@ const Collection = () => {
                     menuItems={[
                         {
                             label: 'Редактировать',
-                            onClick: () => dispatch(setScreenState('edit')),
+                            onClick: () => setMode('edit'),
                         },
                         {
                             label: 'Удалить тему',
@@ -116,14 +136,14 @@ const Collection = () => {
                     <div className="header_title_text">
                         {themeName}
                         <div className="header_title_wordsCounter">
-                            {words.length} слов
+                            {filteredWords.length} слов
                         </div>
                     </div>
 
                     <Controls.Button
                         variant="black_txt"
                         onClick={() => {
-                            dispatch(setScreenState('training'))
+                            setMode('training')
                             navigate('/training')
                         }}
                     >
@@ -133,7 +153,7 @@ const Collection = () => {
             )}
 
             <div className="EditThemePage_ContentWrapper">
-                {mode === 'view' && words.length === 0 ? (
+                {mode === 'view' && filteredWords.length === 0 ? (
                     <div className="collection_empty">
                         <img
                             src={emptyImage}
@@ -145,7 +165,7 @@ const Collection = () => {
                         </p>
                     </div>
                 ) : (
-                    <WordList />
+                    <WordList tag={activeTag} />
                 )}
             </div>
         </div>

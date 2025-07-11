@@ -9,43 +9,52 @@ export const WordsProvider = ({ children }) => {
     const [activeTag, setActiveTag] = useState('') // активная тема
 
     // Загрузка из localStorage
-    useEffect(() => {
-        const storedWords = localStorage.getItem('words')
-        const storedTags = localStorage.getItem('tags')
-        const storedMode = localStorage.getItem('mode')
-        const storedActiveTag = localStorage.getItem('activeTag')
+    // useEffect(() => {
+    //     const storedWords = localStorage.getItem('words')
+    //     const storedTags = localStorage.getItem('tags')
+    //     const storedMode = localStorage.getItem('mode')
+    //     const storedActiveTag = localStorage.getItem('activeTag')
 
-        if (storedWords) setWords(JSON.parse(storedWords))
-        if (storedTags) {
-            try {
-                const parsedTags = JSON.parse(storedTags)
-                if (Array.isArray(parsedTags)) {
-                    setTags(parsedTags)
-                }
-            } catch (e) {
-                console.error('Ошибка при разборе tags из localStorage', e)
-            }
-        }
-        if (storedMode) setMode(storedMode)
-        if (storedActiveTag) setActiveTag(storedActiveTag)
-    }, [])
+    //     if (storedWords) setWords(JSON.parse(storedWords))
+    //     if (storedTags) {
+    //         try {
+    //             const parsedTags = JSON.parse(storedTags)
+    //             if (Array.isArray(parsedTags)) {
+    //                 setTags(parsedTags)
+    //             }
+    //         } catch (e) {
+    //             console.error('Ошибка при разборе tags из localStorage', e)
+    //         }
+    //     }
+    //     if (storedMode) setMode(storedMode)
+    //     if (storedActiveTag) setActiveTag(storedActiveTag)
+    // }, [])
 
     // Сохранение в localStorage
-    useEffect(() => {
-        localStorage.setItem('words', JSON.stringify(words))
-    }, [words])
+    // useEffect(() => {
+    //     localStorage.setItem('words', JSON.stringify(words))
+    // }, [words])
 
-    useEffect(() => {
-        localStorage.setItem('tags', JSON.stringify(tags))
-    }, [tags])
+    // useEffect(() => {
+    //     localStorage.setItem('tags', JSON.stringify(tags))
+    // }, [tags])
 
-    useEffect(() => {
-        localStorage.setItem('mode', mode)
-    }, [mode])
+    // useEffect(() => {
+    //     localStorage.setItem('mode', mode)
+    // }, [mode])
 
-    useEffect(() => {
-        localStorage.setItem('activeTag', activeTag)
-    }, [activeTag])
+    // useEffect(() => {
+    //     localStorage.setItem('activeTag', activeTag)
+    // }, [activeTag])
+
+    const createEmptyWord = (tag) => ({
+        id: crypto.randomUUID(),
+        english: '',
+        transcription: '',
+        russian: '',
+        tags: tag, // ← вот это важно!
+        tags_json: [tag], // чтобы API не поломалось
+    })
 
     return (
         <WordsContext.Provider
@@ -58,6 +67,7 @@ export const WordsProvider = ({ children }) => {
                 setMode,
                 activeTag,
                 setActiveTag,
+                createEmptyWord,
             }}
         >
             {children}
