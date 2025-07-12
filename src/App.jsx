@@ -11,7 +11,6 @@ import NotFound from './pages/NotFound/NotFound.jsx'
 import './App.css'
 import './style/reset.css'
 import './style/normalize.css'
-import { WordsContext } from './store/wordsContext.jsx'
 
 const App = () => {
     const [mode, setMode] = useState(() => {

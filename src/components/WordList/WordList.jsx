@@ -12,23 +12,22 @@ import './WordList.scss'
 import { AppContext } from '../../store/contextTrue'
 
 const WordList = ({ themeName }) => {
-    const { words, setWords, mode, createEmptyWord } = useContext(WordsContext)
+    const { mode, createEmptyWord } = useContext(WordsContext)
 
-    const {
-        words: targetWordsList,
-        addWord,
-        editWord,
-        deleteWord,
-    } = useContext(AppContext)
+    const { words, setWords, addWord, editWord, deleteWord } =
+        useContext(AppContext)
 
     //добавляем 3 пустые карточки, если  статус страницы редактирование + массив пустой + нет флажка больше не добавлять
     useEffect(() => {
-        if (mode === 'edit' && targetWordsList.length === 0) {
-            addWord(themeName)
-            addWord(themeName)
-            addWord(themeName)
+        if (mode === 'edit' && words.length === 0) {
+            const newWords = [
+                createEmptyWord(themeName),
+                createEmptyWord(themeName),
+                createEmptyWord(themeName),
+            ]
+            setWords(newWords)
         }
-    }, [mode, targetWordsList, themeName])
+    }, [mode, words, themeName])
 
     // Очищаем пустые слова при выходе из edit
     useEffect(() => {
@@ -56,8 +55,8 @@ const WordList = ({ themeName }) => {
     }
 
     useEffect(() => {
-        console.log(targetWordsList)
-    }, [targetWordsList])
+        console.log(words)
+    }, [words])
 
     const handleChange = (id, newData) => {
         editWord(id, newData)
@@ -65,7 +64,7 @@ const WordList = ({ themeName }) => {
 
     return (
         <div className="word_list_wrapper">
-            {targetWordsList.map((wordData, idx) =>
+            {words.map((wordData, idx) =>
                 mode === 'edit' ? (
                     <WordCardEditable
                         key={wordData.id}
