@@ -34,20 +34,11 @@ const Collection = () => {
     )
     const words = activeTheme?.words || []
 
-    // 🔧 состояние для редактирования названия
-    const [localName, setLocalName] = useState(activeTheme?.name || '')
-
     useEffect(() => {
         if (!activeThemeId && themes.length > 0) {
             dispatch(setActiveTheme(themes[0].id))
         }
     }, [activeThemeId, themes, dispatch])
-
-    useEffect(() => {
-        if (activeTheme) {
-            setLocalName(activeTheme.name)
-        }
-    }, [activeTheme])
 
     const handleDelete = () => {
         dispatch(deleteTheme(activeThemeId))
@@ -55,9 +46,6 @@ const Collection = () => {
     }
 
     const handleSave = () => {
-        dispatch(renameTheme({ id: activeThemeId, name: localName }))
-        dispatch(setScreenState('view'))
-
         if (!activeTheme) {
             console.warn('Нет активной темы')
             return
@@ -65,13 +53,16 @@ const Collection = () => {
 
         const preparedWords = activeTheme.words
             .filter((word) => word.english.trim() && word.russian.trim())
-            .map(({ english, transcription, russian, tags, tags_json }) => ({
-                english: english.trim(),
-                transcription: transcription.trim(),
-                russian: russian.trim(),
-                tags: localName.trim(),
-                tags_json: '',
-            }))
+            .map(
+                ({ id, english, transcription, russian, tags, tags_json }) => ({
+                    id,
+                    english: english.trim(),
+                    transcription: transcription.trim(),
+                    russian: russian.trim(),
+                    tags,
+                    tags_json,
+                })
+            )
         console.log('🎯 preparedWords', preparedWords)
         console.log(
             '📦 JSON.stringify:',
@@ -79,7 +70,8 @@ const Collection = () => {
         )
 
         console.log('Отправляем на сервер:', preparedWords)
-        dispatch(saveWordsToServer(preparedWords))
+        dispatch(saveWordsToServer(preparedWords, activeTheme.serverActions))
+        dispatch(setScreenState('view'))
     }
 
     return (
@@ -108,8 +100,15 @@ const Collection = () => {
                     />
 
                     <Controls.Input
-                        value={localName}
-                        onChange={(e) => setLocalName(e.target.value)}
+                        value={activeTheme?.name}
+                        onChange={(e) =>
+                            dispatch(
+                                renameTheme({
+                                    id: activeThemeId,
+                                    name: e.target.value,
+                                })
+                            )
+                        }
                     />
 
                     <Controls.Button variant="black_txt" onClick={handleSave}>

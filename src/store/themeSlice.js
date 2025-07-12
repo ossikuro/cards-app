@@ -8,6 +8,7 @@ const initialState = {
             tags: '',
             tags_json: '',
             words: [],
+            serverActions: {},
         },
     ],
     activeThemeId: null,
@@ -36,6 +37,7 @@ const loadWordsFromServer = () => async (dispatch) => {
                 tags: tags,
                 tags_json: '', // если хочешь позже использовать — пусть будет
                 words: words,
+                serverActions: {},
             })
         )
 
@@ -45,34 +47,110 @@ const loadWordsFromServer = () => async (dispatch) => {
     }
 }
 
-const saveWordsToServer = (words) => async (dispatch) => {
-    try {
-        const response = await fetch(
-            'http://itgirlschool.justmakeit.ru/api/words/add',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(words),
+const saveWordsToServer = (words, serverActions) => async (dispatch) => {
+    await Promise.all(
+        words.map(async (word) => {
+            switch (serverActions[word.id]) {
+                case 'add': {
+                    try {
+                        const response = await fetch(
+                            'http://itgirlschool.justmakeit.ru/api/words/add',
+                            {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(word),
+                            }
+                        )
+
+                        if (!response.ok) {
+                            throw new Error(`Ошибка: ${response.status}`)
+                        }
+
+                        const result = await response.json()
+                        console.log('✅ Успешно отправлено на сервер:', result)
+                    } catch (error) {
+                        console.error(
+                            '❌ Ошибка при отправке на сервер:',
+                            error
+                        )
+                    }
+                    break
+                }
+
+                case 'update': {
+                    try {
+                        const response = await fetch(
+                            `http://itgirlschool.justmakeit.ru/api/words/${word.id}/update`,
+                            {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(word),
+                            }
+                        )
+
+                        if (!response.ok) {
+                            throw new Error(`Ошибка: ${response.status}`)
+                        }
+
+                        const result = await response.json()
+                        console.log('✅ Успешно отправлено на сервер:', result)
+                    } catch (error) {
+                        console.error(
+                            '❌ Ошибка при отправке на сервер:',
+                            error
+                        )
+                    }
+                    break
+                }
+                case 'delete': {
+                    try {
+                        const response = await fetch(
+                            `http://itgirlschool.justmakeit.ru/api/words/${word.id}/delete`,
+                            {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(word),
+                            }
+                        )
+
+                        if (!response.ok) {
+                            throw new Error(`Ошибка: ${response.status}`)
+                        }
+
+                        const result = await response.json()
+                        console.log('✅ Успешно отправлено на сервер:', result)
+                    } catch (error) {
+                        console.error(
+                            '❌ Ошибка при отправке на сервер:',
+                            error
+                        )
+                    }
+                    break
+                }
+                default:
+                    break
             }
-        )
-
-        if (!response.ok) {
-            throw new Error(`Ошибка: ${response.status}`)
-        }
-
-        const result = await response.json()
-        console.log('✅ Успешно отправлено на сервер:', result)
-    } catch (error) {
-        console.error('❌ Ошибка при отправке на сервер:', error)
-    }
+        })
+    )
 }
 
 const themeSlice = createSlice({
     name: 'themesStore',
     initialState,
     reducers: {
+        resetServerActions: (state) => {
+            const activeTheme = state.themes.findIndex(
+                (item) => item.id === state.activeThemeId
+            )
+            state.themes[activeTheme].serverActions = {}
+        },
+
         setFetchedThemes: (state, action) => {
             state.themes = action.payload
             if (!state.activeThemeId && action.payload.length > 0) {
@@ -87,6 +165,7 @@ const themeSlice = createSlice({
                 tags: tags,
                 tags_json: '', // ⬅ оставляем пустым
                 words: [],
+                serverActions: {},
             })
         },
         deleteTheme: (state, action) => {
@@ -103,6 +182,19 @@ const themeSlice = createSlice({
             if (theme) {
                 theme.name = action.payload.name
                 theme.tags = action.payload.name // 👈 синхронизируем с name
+                theme.words = theme.words.map((word) => {
+                    if (
+                        theme.serverActions?.[word.id] !== 'add' &&
+                        theme.serverActions?.[word.id] !== 'delete'
+                    ) {
+                        theme.serverActions[word.id] = 'update'
+                    }
+                    return {
+                        ...word,
+                        tags: action.payload.name,
+                        tags_json: JSON.stringify([action.payload.name]),
+                    }
+                })
             }
         },
         setWords: (state, action) => {
@@ -116,10 +208,11 @@ const themeSlice = createSlice({
             if (theme) {
                 const wordWithTag = {
                     ...action.payload,
-                    tags: theme.tags,
-                    tags_json: '',
+                    tags: theme.name,
+                    tags_json: JSON.stringify(theme.name),
                 }
                 theme.words.push(wordWithTag)
+                theme.serverActions[action.payload.id] = 'add'
             }
         },
         updateWord: (state, action) => {
@@ -129,6 +222,9 @@ const themeSlice = createSlice({
                 const index = theme.words.findIndex((w) => w.id === id)
                 if (index !== -1) {
                     theme.words[index] = newWord
+                    if (theme.serverActions[id] !== 'add') {
+                        theme.serverActions[id] = 'update'
+                    }
                 }
             }
         },
@@ -136,6 +232,9 @@ const themeSlice = createSlice({
             const theme = state.themes.find((t) => t.id === state.activeThemeId)
             if (theme) {
                 theme.words = theme.words.filter((w) => w.id !== action.payload)
+                if (theme.serverActions[id] !== 'add') {
+                    theme.serverActions[action.payload.id] = 'delete'
+                }
             }
         },
     },
