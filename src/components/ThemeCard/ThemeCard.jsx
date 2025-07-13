@@ -16,7 +16,7 @@ const ThemeCard = ({ theme, menuItems = [] }) => {
 
     // Слова, готовые к тренировке
     const wordsToTrain = allWords.filter(
-        (item) => item.word?.trim() && item.translation?.trim()
+        (item) => item.english?.trim() && item.russian?.trim()
     )
 
     // Имя темы: используем как есть, если задано, иначе показываем "Новая тема"
