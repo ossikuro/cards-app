@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { ContextProvider } from './store/contextTrue.jsx'
-import { WordsProvider } from './store/wordsContext.jsx'
 
 import HomePage from './pages/Home/HomePage.jsx'
 import TrainingPage from './pages/Training/TrainingPage.jsx'
@@ -19,22 +18,20 @@ const App = () => {
     })
 
     return (
-        <WordsProvider>
-            <ContextProvider>
-                <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route
-                        path="/collection"
-                        element={<Collection mode={mode} setMode={setMode} />}
-                    />
-                    <Route
-                        path="/training"
-                        element={<TrainingPage mode={mode} setMode={setMode} />}
-                    />
-                    <Route path="*" element={<NotFound />} />
-                </Routes>
-            </ContextProvider>
-        </WordsProvider>
+        <ContextProvider>
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route
+                    path="/collection"
+                    element={<Collection mode={mode} setMode={setMode} />}
+                />
+                <Route
+                    path="/training"
+                    element={<TrainingPage mode={mode} setMode={setMode} />}
+                />
+                <Route path="*" element={<NotFound />} />
+            </Routes>
+        </ContextProvider>
     )
 }
 

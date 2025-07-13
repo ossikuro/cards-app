@@ -1,27 +1,26 @@
 //хуки
-import { useEffect, useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useContext, useState } from 'react'
+import { useSelector } from 'react-redux'
 //компоненты
 import Controls from '../../components/Controls/index.jsx'
 import Header from '../../components/Header/Header.jsx'
 import WordListTraining from '../../components/WordListTraining/WordListTraining'
-//редьюсеры
-import { setScreenState } from '../../store/themeScreenSlice'
+
+import { AppContext } from '../../store/contextTrue'
+
 //картинки, иконки, стили
 import BackButton from '../../assets/icons/chevron_left.svg?react'
 import emptyImage from '../../assets/emptyImage.png'
 import './TrainingPage.scss'
 
 const TrainingPage = () => {
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
+    //const navigate = useNavigate()
+    //const dispatch = useDispatch()
+
+    const { activeTheme, setMode } = useContext(AppContext)
 
     const activeThemeId = useSelector(
         (state) => state.themesStore.activeThemeId
-    )
-    const activeTheme = useSelector((state) =>
-        state.themesStore.themes.find((t) => t.id === activeThemeId)
     )
 
     const allWords = activeTheme?.words || []
@@ -31,8 +30,8 @@ const TrainingPage = () => {
 
     const words = allWords.filter((item) => {
         if (!item) return false
-        if (!item.word || item.word.trim() === '') return false
-        if (!item.translation || item.translation.trim() === '') return false
+        if (!item.english || item.english.trim() === '') return false
+        if (!item.russian || item.russian.trim() === '') return false
         return true
     })
 
@@ -43,14 +42,14 @@ const TrainingPage = () => {
                     {
                         label: 'Редактировать',
                         onClick: () => {
-                            dispatch(setScreenState('edit'))
+                            setMode('edit')
                             navigate('/collection')
                         },
                     },
                     {
                         label: 'Удалить',
                         onClick: () => {
-                            dispatch(setScreenState('view'))
+                            setMode('view')
                             navigate('/collection')
                         },
                     },
@@ -71,7 +70,7 @@ const TrainingPage = () => {
                 <Controls.Button
                     variant="black_txt"
                     onClick={() => {
-                        dispatch(setScreenState('view'))
+                        setMode('view')
                         navigate('/collection')
                     }}
                 >
