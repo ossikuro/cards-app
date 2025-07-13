@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { WordsContext } from '../../store/wordsContext'
 import { AppContext } from '../../store/contextTrue'
 
 import WordList from '../../components/WordList/WordList.jsx'

@@ -207,34 +207,7 @@ export const ContextProvider = ({ children }) => {
         setThemes((prev) => [...prev, newTheme])
     }
 
-    const editTheme = (themeId, newName) => {
-        // 1) Переименовываем тему в списке themes
-        setThemes((prev) =>
-            prev.map((t) =>
-                t.id === themeId ? { ...t, id: newName, name: newName } : t
-            )
-        )
-
-        // 2) Если это текущая activeTheme — тоже обновляем
-        if (activeTheme?.id === themeId) {
-            setActiveTheme((prev) => ({ ...prev, id: newName, name: newName }))
-        }
-
-        // 3) Обновляем все слова старой темы
-        setWords((prev) =>
-            prev.map((w) => {
-                if (w.tags === themeId) {
-                    const updated = {
-                        ...w,
-                        tags: newName,
-                        tags_json: JSON.stringify([newName]),
-                    }
-                    return updated
-                }
-                return w
-            })
-        )
-    }
+    const editTheme = (themeName, newName) => {}
 
     const saveTheme = () => {
         if (!activeTheme) {
