@@ -117,6 +117,35 @@ export const ContextProvider = ({ children }) => {
         setThemes((prev) => [...prev, newTheme])
     }
 
+    const saveTheme = () => {
+        if (!activeTheme) {
+            console.warn('Нет активной темы')
+            return
+        }
+
+        const preparedWords = activeTheme.words
+            .filter((word) => word.english.trim() && word.russian.trim())
+            .map(
+                ({ id, english, transcription, russian, tags, tags_json }) => ({
+                    id,
+                    english: english.trim(),
+                    transcription: transcription.trim(),
+                    russian: russian.trim(),
+                    tags,
+                    tags_json,
+                })
+            )
+        console.log('🎯 preparedWords', preparedWords)
+        console.log(
+            '📦 JSON.stringify:',
+            JSON.stringify(preparedWords, null, 2)
+        )
+
+        console.log('Отправляем на сервер:', preparedWords)
+        dispatch(saveWordsToServer(preparedWords, activeTheme.serverActions))
+        dispatch(setScreenState('view'))
+    }
+
     return (
         <AppContext.Provider
             value={{
@@ -130,6 +159,7 @@ export const ContextProvider = ({ children }) => {
                 setThemes,
                 deleteTheme,
                 addTheme,
+                saveTheme,
                 activeTheme,
                 setActiveTheme,
                 mode,
