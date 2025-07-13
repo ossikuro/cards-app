@@ -17,43 +17,45 @@ const Collection = () => {
     const navigate = useNavigate()
 
     const {
-        tags,
-        setTags,
-        activeTag,
-        setActiveTag,
-        setWords,
+        themes,
+        activeTheme,
+        setActiveTheme,
+        deleteTheme,
         words,
-        setMode,
         mode,
-    } = useContext(WordsContext)
+        setMode,
+    } = useContext(AppContext)
+
+    const { setTags, activeTag, setActiveTag, setWords } =
+        useContext(WordsContext)
 
     /** автовыбор первой темы как активной */
     useEffect(() => {
-        if (!activeTag && tags.length > 0) {
-            setActiveTag(tags[0])
+        if (!activeTheme && themes.length > 0) {
+            setActiveTheme(themes[0])
         }
-    }, [activeTag, tags])
+    }, [activeTheme, themes])
 
     // локальное состояние имени темы
-    const [themeName, setThemeName] = useState(activeTag || 'Без названия')
+    const [themeName, setThemeName] = useState(
+        activeTheme?.name || 'Без названия'
+    )
+
     useEffect(() => {
-        setThemeName(activeTag || 'Без названия')
-    }, [activeTag])
+        setThemeName(activeTheme?.name || 'Без названия')
+    }, [activeTheme])
 
     // фильтрация слов по активной теме
     const filteredWords = words.filter(
-        (word) =>
-            // либо tags совпадает
-            word.tags === activeTag ||
-            // либо, если tags не задан, смотрим на legacy-поле tag
-            word.tag === activeTag
+        (word) => word.tags === activeTheme?.name
     )
 
     const handleDelete = () => {
-        setTags((prev) => prev.filter((tag) => tag !== activeTag))
-        setWords((prev) => prev.filter((word) => word.tags !== activeTag))
-        setActiveTag(null)
-        navigate('/')
+        if (activeTheme) {
+            deleteTheme(activeTheme.name)
+            setActiveTheme(null)
+            navigate('/')
+        }
     }
 
     const handleSave = () => {
@@ -70,14 +72,56 @@ const Collection = () => {
         setMode('view')
     }
 
-    // Отладочный эффект: вывод состояния после изменений
+    // ====== ОТЛАДОЧНЫЙ БЛОК ======
     useEffect(() => {
-        console.log('--- Отладка состояния ---')
-        console.log('activeTag:', activeTag)
-        console.log('themeName:', themeName)
-        console.log('words:', words)
-        console.log('filteredWords:', filteredWords)
-    }, [activeTag, themeName, words, filteredWords])
+        console.log('--- ОТЛАДКА ---')
+        if (!words || words.length === 0) {
+            console.log('СЛОВА: массив пустой или не загружен')
+        } else {
+            console.log('СЛОВА (первые 3):', words.slice(0, 3))
+            words.slice(0, 3).forEach((w, i) => {
+                console.log(`Слово[${i}]:`, w)
+            })
+        }
+
+        if (!themes || themes.length === 0) {
+            console.log('ТЕМЫ: массив пустой или не загружен')
+        } else {
+            console.log('ТЕМЫ (первые 3):', themes.slice(0, 3))
+            themes.slice(0, 3).forEach((t, i) => {
+                console.log(`Тема[${i}]:`, t)
+            })
+        }
+
+        if (!activeTheme) {
+            console.log('activeTheme: НЕ выбран!')
+        } else {
+            console.log('activeTheme:', activeTheme)
+        }
+
+        // Проверка совпадений для фильтрации
+        if (activeTheme && words && words.length > 0) {
+            const sampleWord = words.find(
+                (w) => w.tags === activeTheme.name || w.tags === activeTheme.id
+            )
+            if (sampleWord) {
+                console.log('СОВПАДЕНИЕ найдено:', sampleWord)
+            } else {
+                console.log(
+                    'Нет ни одного слова с tags ===',
+                    activeTheme.name,
+                    'или',
+                    activeTheme.id
+                )
+            }
+        }
+
+        console.log('filteredWords.length:', filteredWords.length)
+        if (filteredWords.length > 0) {
+            console.log('filteredWords[0]:', filteredWords[0])
+        }
+    }, [words, themes, activeTheme, filteredWords])
+    // ====== КОНЕЦ ОТЛАДОЧНОГО БЛОКА ======
 
     return (
         <div className="Collection">
@@ -98,7 +142,7 @@ const Collection = () => {
                         variant="transparent_icon"
                         aria-label="Назад"
                         onClick={() => {
-                            navigate('/collection')
+                            navigate('/Collection')
                             setMode('view')
                         }}
                         icon={<BackButton />}
@@ -165,7 +209,7 @@ const Collection = () => {
                         </p>
                     </div>
                 ) : (
-                    <WordList tag={activeTag} />
+                    <WordList themeName={activeTheme?.name} />
                 )}
             </div>
         </div>

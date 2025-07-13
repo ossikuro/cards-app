@@ -1,7 +1,6 @@
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { WordsContext } from '../../store/wordsContext.jsx'
 import { AppContext } from '../../store/contextTrue'
 
 import Controls from '../Controls'
@@ -24,7 +23,7 @@ const ThemeCard = ({ theme, menuItems = [] }) => {
     const themeName = theme.name?.trim() || 'Новая тема'
 
     const handleView = () => {
-        setActiveTheme(theme.id)
+        setActiveTheme(theme)
         setMode('view')
         navigate('/collection')
     }

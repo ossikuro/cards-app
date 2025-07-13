@@ -10,7 +10,7 @@ import './ThemeList.scss'
 const ThemeList = ({ themes = [], setMode }) => {
     const navigate = useNavigate()
 
-    const { addTheme, deleteTheme } = useContext(AppContext)
+    const { addTheme, deleteTheme, setActiveTheme } = useContext(AppContext)
 
     const handleAddTheme = () => {
         addTheme()
@@ -30,6 +30,7 @@ const ThemeList = ({ themes = [], setMode }) => {
                         {
                             label: 'Редактировать',
                             onClick: () => {
+                                setActiveTheme(showTheme.id)
                                 setMode('edit')
                                 navigate('/collection')
                             },

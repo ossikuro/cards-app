@@ -111,7 +111,7 @@ export const ContextProvider = ({ children }) => {
             : baseName
 
         const newTheme = {
-            id: crypto.randomUUID(),
+            id: newName,
             name: newName, // было themeName
         }
         setThemes((prev) => [...prev, newTheme])

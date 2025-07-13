@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import Controls from '../Controls'
+
 import './WordCardTraining.scss'
+
 import useAutoFocus from '../Hooks/autoFocus'
 
 const WordCardTraining = ({ data = {}, onReveal }) => {
@@ -20,7 +22,7 @@ const WordCardTraining = ({ data = {}, onReveal }) => {
     return (
         <div className="wordCardTraining_wrapper">
             <div className="wordCardTraining_word_wrapper">
-                <div className="wordCardTraining_word">{data.word}</div>
+                <div className="wordCardTraining_word">{data.english}</div>
                 <div className="wordCardTraining_transcription">
                     {data.transcription}
                 </div>
@@ -29,7 +31,7 @@ const WordCardTraining = ({ data = {}, onReveal }) => {
             <div className="wordCardTraining_translation_wrapper">
                 {showTranslation && (
                     <div className="wordCardTraining_translation">
-                        {data.translation}
+                        {data.russian}
                     </div>
                 )}
             </div>

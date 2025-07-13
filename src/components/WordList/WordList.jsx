@@ -1,6 +1,5 @@
 //хуки
-import { useEffect } from 'react'
-import { useContext } from 'react'
+import { useEffect, useContext, useRef } from 'react'
 //хранилка
 import { WordsContext } from '../../store/wordsContext'
 //компоненты
@@ -12,22 +11,35 @@ import './WordList.scss'
 import { AppContext } from '../../store/contextTrue'
 
 const WordList = ({ themeName }) => {
-    const { mode, createEmptyWord } = useContext(WordsContext)
+    const { createEmptyWord } = useContext(WordsContext)
 
-    const { words, setWords, addWord, editWord, deleteWord } =
+    const { words, setWords, addWord, editWord, deleteWord, mode } =
         useContext(AppContext)
+
+    const filteredWords = words.filter((word) => word.tags === themeName)
+
+    const wasEmptyInit = useRef(false) // для слежки за количеством карточек на странице
 
     //добавляем 3 пустые карточки, если  статус страницы редактирование + массив пустой + нет флажка больше не добавлять
     useEffect(() => {
-        if (mode === 'edit' && words.length === 0) {
+        if (
+            mode === 'edit' &&
+            filteredWords.length === 0 &&
+            !wasEmptyInit.current
+        ) {
             const newWords = [
                 createEmptyWord(themeName),
                 createEmptyWord(themeName),
                 createEmptyWord(themeName),
             ]
             setWords(newWords)
+            wasEmptyInit.current = true
         }
-    }, [mode, words, themeName])
+        // Сбросить флаг, если вышли из edit-режима
+        if (mode !== 'edit') {
+            wasEmptyInit.current = false
+        }
+    }, [mode, filteredWords, themeName])
 
     // Очищаем пустые слова при выходе из edit
     useEffect(() => {
@@ -64,7 +76,7 @@ const WordList = ({ themeName }) => {
 
     return (
         <div className="word_list_wrapper">
-            {words.map((wordData, idx) =>
+            {filteredWords.map((wordData, idx) =>
                 mode === 'edit' ? (
                     <WordCardEditable
                         key={wordData.id}
