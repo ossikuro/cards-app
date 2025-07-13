@@ -1,15 +1,70 @@
 import { createContext, useState } from 'react'
+import * as api from './apiConnection.js'
 
 export const AppContext = createContext()
+
+const initialState = {
+    themes: [
+        {
+            id: crypto.randomUUID(),
+            name: 'Список слов',
+            tags: '',
+            tags_json: '',
+            words: [],
+            serverActions: {},
+        },
+    ],
+    activeThemeId: null,
+}
 
 export const ContextProvider = ({ children }) => {
     const [words, setWords] = useState([])
     const [themes, setThemes] = useState([])
+    const [activeTheme, setActiveTheme] = useState('')
     const [mode, setMode] = useState('view')
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
 
-    useEffect(() => {
-        fetch('https://itgirlschool.justmakeit.ru/api/words')
-    })
+    const loadWords = async () => {
+        setLoading(true)
+        setError(null)
+
+        try {
+            console.log('Запрос к API начинается')
+            const apiWords = await api.getWords()
+            const apiThemes = {}
+
+            console.log('Данные с API:', apiWords)
+
+            // собираем названия тем
+            apiWords.forEach((word) => {
+                const theme = word.tags || 'Без названия'
+
+                if (!apiThemes[theme]) {
+                    apiThemes[theme] = []
+                }
+                apiThemes[theme].push(word)
+            })
+
+            // Формируем массив тем с нужной структурой
+            const groupedThemes = Object.entries(apiThemes).map(
+                ([tags, words]) => ({
+                    id: tags,
+                    name: tags,
+                    words: words,
+                    serverActions: {}, // для отслеживания изменений на сервере
+                })
+            )
+            // Обновляем состояние тем и слов
+            setThemes(groupedThemes)
+            setWords(apiWords)
+        } catch (err) {
+            console.error('Ошибка в loadWords:', err)
+            setError(err.message)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const deleteWord = (id) => {
         const cleanCollection = words.filter((word) => word.id !== id)
@@ -48,8 +103,8 @@ export const ContextProvider = ({ children }) => {
 
     const addTheme = () => {
         const baseName = 'Новая тема'
-        const names = themes.map((t) => t.themeName)
-        const sameNames = names.filter((n) => n.startsWith(baseName))
+        const names = themes.map((t) => t.name) // было t.themeName
+        const sameNames = names.filter((n) => n && n.startsWith(baseName)) // добавил проверку n
 
         const newName = sameNames.length
             ? `${baseName} ${sameNames.length + 1}`
@@ -57,28 +112,31 @@ export const ContextProvider = ({ children }) => {
 
         const newTheme = {
             id: crypto.randomUUID(),
-            themeName: newName,
+            name: newName, // было themeName
         }
         setThemes((prev) => [...prev, newTheme])
     }
 
     return (
-        <AppContext
+        <AppContext.Provider
             value={{
                 words,
                 setWords,
                 deleteWord,
                 editWord,
                 addWord,
+                loadWords,
                 themes,
                 setThemes,
                 deleteTheme,
                 addTheme,
+                activeTheme,
+                setActiveTheme,
                 mode,
                 setMode,
             }}
         >
             {children}
-        </AppContext>
+        </AppContext.Provider>
     )
 }

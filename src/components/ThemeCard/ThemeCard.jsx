@@ -2,15 +2,18 @@ import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { WordsContext } from '../../store/wordsContext.jsx'
+import { AppContext } from '../../store/contextTrue'
+
 import Controls from '../Controls'
 import './ThemeCard.scss'
 
 const ThemeCard = ({ theme, menuItems = [] }) => {
-    const { words, setActiveTag, setMode } = useContext(WordsContext)
+    const { words, setMode, setActiveTheme } = useContext(AppContext)
+
     const navigate = useNavigate()
 
     // Слова, привязанные к этой теме
-    const allWords = words.filter((word) => word.tags.includes(theme.id))
+    const allWords = words.filter((word) => word.tags === theme.id)
 
     // Слова, готовые к тренировке
     const wordsToTrain = allWords.filter(
@@ -21,7 +24,7 @@ const ThemeCard = ({ theme, menuItems = [] }) => {
     const themeName = theme.name?.trim() || 'Новая тема'
 
     const handleView = () => {
-        setActiveTag(theme.id)
+        setActiveTheme(theme.id)
         setMode('view')
         navigate('/collection')
     }

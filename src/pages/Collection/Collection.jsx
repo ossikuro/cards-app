@@ -1,14 +1,14 @@
-//хуки
 import { useEffect, useState } from 'react'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-//хранилка
+
 import { WordsContext } from '../../store/wordsContext'
-//компоненты
+import { AppContext } from '../../store/contextTrue'
+
 import WordList from '../../components/WordList/WordList.jsx'
 import Controls from '../../components/Controls'
 import Header from '../../components/Header/Header.jsx'
-//картинки, иконки, стили
+
 import BackButton from '../../assets/icons/chevron_left.svg?react'
 import emptyImage from '../../assets/emptyImage.png'
 import './Collection.scss'
