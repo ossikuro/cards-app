@@ -30,7 +30,7 @@ const ThemeList = ({ themes = [], setMode }) => {
                         {
                             label: 'Редактировать',
                             onClick: () => {
-                                setActiveTheme(showTheme.id)
+                                setActiveTheme(showTheme)
                                 setMode('edit')
                                 navigate('/collection')
                             },

@@ -18,16 +18,17 @@ const Collection = () => {
 
     const {
         themes,
+        setThemes,
         activeTheme,
         setActiveTheme,
         deleteTheme,
+        editTheme,
         words,
+        setWords,
         mode,
         setMode,
+        saveWords,
     } = useContext(AppContext)
-
-    const { setTags, activeTag, setActiveTag, setWords } =
-        useContext(WordsContext)
 
     /** автовыбор первой темы как активной */
     useEffect(() => {
@@ -47,7 +48,7 @@ const Collection = () => {
 
     // фильтрация слов по активной теме
     const filteredWords = words.filter(
-        (word) => word.tags === activeTheme?.name
+        (word) => word && word.tags === activeTheme?.name
     )
 
     const handleDelete = () => {
@@ -58,69 +59,34 @@ const Collection = () => {
         }
     }
 
-    const handleSave = () => {
-        console.log('Сохраняем тему:', activeTag, '→', themeName)
-        setTags((prev) =>
-            prev.map((tag) => (tag === activeTag ? themeName : tag))
-        )
-        setWords((prev) =>
-            prev.map((word) =>
-                word.tags === activeTag ? { ...word, tags: themeName } : word
+    const handleSave = async () => {
+        console.log('Сохраняем тему:', activeTheme, '→', themeName)
+
+        // Обновляем массив тем, меняя только у нужного объекта
+        setThemes((prev) =>
+            prev.map((theme) =>
+                theme.id === activeTheme.id
+                    ? { ...theme, name: themeName }
+                    : theme
             )
         )
-        setActiveTag(themeName) // обновляем активную тему
+
+        // Обновляем теги у слов по старому имени темы
+        setWords((prev) =>
+            prev.map((word) =>
+                word.tags === activeTheme.name
+                    ? { ...word, tags: themeName }
+                    : word
+            )
+        )
+
+        setActiveTheme((prev) => ({ ...prev, name: themeName }))
+        await saveWords()
         setMode('view')
     }
 
     // ====== ОТЛАДОЧНЫЙ БЛОК ======
-    useEffect(() => {
-        console.log('--- ОТЛАДКА ---')
-        if (!words || words.length === 0) {
-            console.log('СЛОВА: массив пустой или не загружен')
-        } else {
-            console.log('СЛОВА (первые 3):', words.slice(0, 3))
-            words.slice(0, 3).forEach((w, i) => {
-                console.log(`Слово[${i}]:`, w)
-            })
-        }
 
-        if (!themes || themes.length === 0) {
-            console.log('ТЕМЫ: массив пустой или не загружен')
-        } else {
-            console.log('ТЕМЫ (первые 3):', themes.slice(0, 3))
-            themes.slice(0, 3).forEach((t, i) => {
-                console.log(`Тема[${i}]:`, t)
-            })
-        }
-
-        if (!activeTheme) {
-            console.log('activeTheme: НЕ выбран!')
-        } else {
-            console.log('activeTheme:', activeTheme)
-        }
-
-        // Проверка совпадений для фильтрации
-        if (activeTheme && words && words.length > 0) {
-            const sampleWord = words.find(
-                (w) => w.tags === activeTheme.name || w.tags === activeTheme.id
-            )
-            if (sampleWord) {
-                console.log('СОВПАДЕНИЕ найдено:', sampleWord)
-            } else {
-                console.log(
-                    'Нет ни одного слова с tags ===',
-                    activeTheme.name,
-                    'или',
-                    activeTheme.id
-                )
-            }
-        }
-
-        console.log('filteredWords.length:', filteredWords.length)
-        if (filteredWords.length > 0) {
-            console.log('filteredWords[0]:', filteredWords[0])
-        }
-    }, [words, themes, activeTheme, filteredWords])
     // ====== КОНЕЦ ОТЛАДОЧНОГО БЛОКА ======
 
     return (

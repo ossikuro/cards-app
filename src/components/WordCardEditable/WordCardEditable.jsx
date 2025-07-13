@@ -21,7 +21,7 @@ const WordCardEditable = ({ data = {}, onChange, onDelete, index = 0 }) => {
             if (onlyEnglish.test(value)) {
                 setError(false) // убираем ошибку
                 setWord(value) // обновляем слово локально
-                onChange({ ...data, word: value }) // запускаем обновление массива в родителе
+                onChange({ ...data, english: value }) // запускаем обновление массива в родителе
             } else {
                 setError(true) // ставим ошибку
                 return // не передаём родителю

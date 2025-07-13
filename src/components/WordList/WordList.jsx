@@ -1,7 +1,7 @@
 //хуки
 import { useEffect, useContext, useRef } from 'react'
 //хранилка
-import { WordsContext } from '../../store/wordsContext'
+
 //компоненты
 import WordCardEditable from '../WordCardEditable/WordCardEditable'
 import WordCard from '../WordCard/WordCard'
@@ -11,12 +11,14 @@ import './WordList.scss'
 import { AppContext } from '../../store/contextTrue'
 
 const WordList = ({ themeName }) => {
-    const { createEmptyWord } = useContext(WordsContext)
-
     const { words, setWords, addWord, editWord, deleteWord, mode } =
         useContext(AppContext)
 
+    console.log('▶ all words:', words)
+
     const filteredWords = words.filter((word) => word.tags === themeName)
+
+    console.log('▶ filteredWords:', filteredWords)
 
     const wasEmptyInit = useRef(false) // для слежки за количеством карточек на странице
 
@@ -27,12 +29,9 @@ const WordList = ({ themeName }) => {
             filteredWords.length === 0 &&
             !wasEmptyInit.current
         ) {
-            const newWords = [
-                createEmptyWord(themeName),
-                createEmptyWord(themeName),
-                createEmptyWord(themeName),
-            ]
-            setWords(newWords)
+            addWord(themeName)
+            addWord(themeName)
+            addWord(themeName)
             wasEmptyInit.current = true
         }
         // Сбросить флаг, если вышли из edit-режима

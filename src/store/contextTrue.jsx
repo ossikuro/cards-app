@@ -20,21 +20,19 @@ const initialState = {
 export const ContextProvider = ({ children }) => {
     const [words, setWords] = useState([])
     const [themes, setThemes] = useState([])
-    const [activeTheme, setActiveTheme] = useState('')
+    const [activeTheme, setActiveTheme] = useState(null)
     const [mode, setMode] = useState('view')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
+    const [serverActions, setServerActions] = useState({})
 
     const loadWords = async () => {
         setLoading(true)
         setError(null)
 
         try {
-            console.log('Запрос к API начинается')
             const apiWords = await api.getWords()
             const apiThemes = {}
-
-            console.log('Данные с API:', apiWords)
 
             // собираем названия тем
             apiWords.forEach((word) => {
@@ -66,39 +64,131 @@ export const ContextProvider = ({ children }) => {
         }
     }
 
+    const saveWords = async () => {
+        if (!activeTheme) return
+        const wordsToSave = words.filter(
+            (word) => word.tags === activeTheme.name
+        )
+        console.log('🔍 saveWords — wordsToSave:', wordsToSave)
+        console.log(
+            '🔍 saveWords — serverActions перед отправкой:',
+            serverActions
+        )
+        try {
+            await api.sendWords(wordsToSave, serverActions)
+            setServerActions({})
+            setMode('view')
+            console.log('Слова успешно сохранены')
+        } catch (error) {
+            console.error('Ошибка при сохранении:', error)
+        }
+    }
+
     const deleteWord = (id) => {
         const cleanCollection = words.filter((word) => word.id !== id)
+        setServerActions((prev) => ({ ...prev, [id]: 'delete' }))
         setWords(cleanCollection)
+
+        console.log(cleanCollection)
     }
 
     /** payload = {} */
     const editWord = (id, payload) => {
-        const cleanCollection = words.map((word) => {
-            if (word.id === id) {
-                return { ...payload, id }
-            } else {
-                return word
+        // 1) Обновляем сам массив words
+        setWords((prev) =>
+            prev.map((w) =>
+                w.id === id
+                    ? { ...w, ...payload, tags_json: JSON.stringify([w.tags]) }
+                    : w
+            )
+        )
+        // 2) Ставим serverActions[id] = 'update', если это не новое слово
+        setServerActions((prev) => {
+            const next = { ...prev }
+            if (next[id] !== 'add') {
+                next[id] = 'update'
             }
+            return next
         })
-        setWords(cleanCollection)
     }
 
-    const addWord = (theme) => {
+    const addWord = (themeName) => {
         const newWord = {
             id: crypto.randomUUID(),
             english: '',
             transcription: '',
             russian: '',
-            tags: theme,
-            tags_json: JSON.stringify([theme]),
+            tags: themeName,
+            tags_json: JSON.stringify([themeName]),
         }
-        const cleanCollection = [...words, newWord]
-        setWords(cleanCollection)
+        setWords((prev) => [...prev, newWord])
+        setServerActions((prev) => ({ ...prev, [newWord.id]: 'add' }))
     }
 
-    const deleteTheme = (themeId) => {
-        setWords((prev) => prev.filter((word) => word.tags !== themeId))
-        setThemes((prev) => prev.filter((theme) => theme.id !== themeId))
+    // const deleteTheme = (themeId) => {
+    //     setWords((prev) => prev.filter((word) => word.tags !== themeId))
+    //     setThemes((prev) => prev.filter((theme) => theme.id !== themeId))
+    // }
+    const deleteTheme = async (themeId) => {
+        console.log(
+            '🗑️ deleteTheme — все теги в словах:',
+            words.map((w) => w.tags)
+        )
+
+        // 1) Собираем ID всех слов, подходящих под удаление темы
+        const idsToDelete = words
+            .filter(
+                (w) =>
+                    w.tags === themeId ||
+                    (themeId === 'Без названия' && (!w.tags || w.tags === ''))
+            )
+            .map((w) => w.id)
+        console.log(
+            '🗑️ deleteTheme — idsToDelete после расширенного фильтра:',
+            idsToDelete
+        )
+
+        if (idsToDelete.length === 0) {
+            console.warn(
+                '⚠️ deleteTheme — не найдено слов для удаления в теме',
+                themeId
+            )
+        }
+
+        // 2) Локально чистим words и themes
+        setWords((prev) => prev.filter((w) => !idsToDelete.includes(w.id)))
+        setThemes((prev) => prev.filter((t) => t.id !== themeId))
+
+        // 3) Удаляем каждое слово на сервере
+        try {
+            await Promise.all(
+                idsToDelete.map((id) => {
+                    console.log(
+                        `🗑️ deleteTheme — отправляем delete для слова ${id}`
+                    )
+                    return api
+                        .sendWord({ id }, 'delete')
+                        .then((res) =>
+                            console.log(
+                                `✅ deleteTheme — слово ${id} удалено`,
+                                res
+                            )
+                        )
+                        .catch((err) =>
+                            console.error(
+                                `❌ deleteTheme — ошибка при удалении ${id}`,
+                                err
+                            )
+                        )
+                })
+            )
+            console.log('✅ deleteTheme — все слова темы удалены на сервере')
+        } catch (err) {
+            console.error('❌ deleteTheme — общий catch:', err)
+        }
+
+        // 4) После успешного удаления можно перезагрузить данные, если нужно
+        // await loadWords()
     }
 
     const addTheme = () => {
@@ -115,6 +205,35 @@ export const ContextProvider = ({ children }) => {
             name: newName, // было themeName
         }
         setThemes((prev) => [...prev, newTheme])
+    }
+
+    const editTheme = (themeId, newName) => {
+        // 1) Переименовываем тему в списке themes
+        setThemes((prev) =>
+            prev.map((t) =>
+                t.id === themeId ? { ...t, id: newName, name: newName } : t
+            )
+        )
+
+        // 2) Если это текущая activeTheme — тоже обновляем
+        if (activeTheme?.id === themeId) {
+            setActiveTheme((prev) => ({ ...prev, id: newName, name: newName }))
+        }
+
+        // 3) Обновляем все слова старой темы
+        setWords((prev) =>
+            prev.map((w) => {
+                if (w.tags === themeId) {
+                    const updated = {
+                        ...w,
+                        tags: newName,
+                        tags_json: JSON.stringify([newName]),
+                    }
+                    return updated
+                }
+                return w
+            })
+        )
     }
 
     const saveTheme = () => {
@@ -135,13 +254,7 @@ export const ContextProvider = ({ children }) => {
                     tags_json,
                 })
             )
-        console.log('🎯 preparedWords', preparedWords)
-        console.log(
-            '📦 JSON.stringify:',
-            JSON.stringify(preparedWords, null, 2)
-        )
 
-        console.log('Отправляем на сервер:', preparedWords)
         dispatch(saveWordsToServer(preparedWords, activeTheme.serverActions))
         dispatch(setScreenState('view'))
     }
@@ -155,6 +268,7 @@ export const ContextProvider = ({ children }) => {
                 editWord,
                 addWord,
                 loadWords,
+                saveWords,
                 themes,
                 setThemes,
                 deleteTheme,
