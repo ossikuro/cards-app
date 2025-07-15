@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -40,6 +40,8 @@ const Collection = () => {
     const [themeName, setThemeName] = useState(
         activeTheme?.name || 'Без названия'
     )
+    // Реф для хранения оригинального имени
+    const originalName = useRef(activeTheme?.name)
 
     useEffect(() => {
         setThemeName(activeTheme?.name || 'Без названия')
@@ -60,6 +62,10 @@ const Collection = () => {
 
     const handleSave = async () => {
         console.log('Сохраняем тему:', activeTheme, '→', themeName)
+
+        if (themeName.trim() && activeTheme !== originalName.current) {
+            editTheme(originalName.current, themeName)
+        }
 
         // Обновляем массив тем, меняя только у нужного объекта
         setThemes((prev) =>

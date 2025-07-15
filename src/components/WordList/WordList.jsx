@@ -14,11 +14,7 @@ const WordList = ({ themeName }) => {
     const { words, setWords, addWord, editWord, deleteWord, mode } =
         useContext(AppContext)
 
-    console.log('▶ all words:', words)
-
     const filteredWords = words.filter((word) => word.tags === themeName)
-
-    console.log('▶ filteredWords:', filteredWords)
 
     const wasEmptyInit = useRef(false) // для слежки за количеством карточек на странице
 

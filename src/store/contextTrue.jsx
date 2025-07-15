@@ -125,10 +125,6 @@ export const ContextProvider = ({ children }) => {
         setServerActions((prev) => ({ ...prev, [newWord.id]: 'add' }))
     }
 
-    // const deleteTheme = (themeId) => {
-    //     setWords((prev) => prev.filter((word) => word.tags !== themeId))
-    //     setThemes((prev) => prev.filter((theme) => theme.id !== themeId))
-    // }
     const deleteTheme = async (themeId) => {
         console.log(
             '🗑️ deleteTheme — все теги в словах:',
@@ -207,7 +203,49 @@ export const ContextProvider = ({ children }) => {
         setThemes((prev) => [...prev, newTheme])
     }
 
-    const editTheme = (themeName, newName) => {}
+    const editTheme = (originalName, newName) => {
+        // 1) Переименовываем тему в списке themes
+        setThemes((prev) =>
+            prev.map((theme) =>
+                theme.id === originalName
+                    ? { ...theme, id: newName, name: newName }
+                    : theme
+            )
+        )
+
+        // 2. Обновляем все слова этой темы, используя editWord
+        words
+            .filter((word) => word.tags === originalName)
+            .forEach((word) => {
+                editWord(word.id, {
+                    tags: newName,
+                    tags_json: JSON.stringify([newName]),
+                })
+            })
+        // // Обновляем тему в словах
+        // setWords((prev) =>
+        //     prev.map((word) =>
+        //         word.tags === originalName
+        //             ? {
+        //                   ...word,
+        //                   tags: newName,
+        //                   tags_json: JSON.stringify([newName]),
+        //               }
+        //             : word
+        //     )
+        // )
+
+        // // Запускаяем простановку статуса словам
+        // setServerActions((prev) => {
+        //     const updated = { ...prev }
+        //     words.forEach((word) => {
+        //         if (word.tags === newName && updated[word.id] !== 'add') {
+        //             updated[word.id] = 'update'
+        //         }
+        //     })
+        //     return updated
+        // })
+    }
 
     const saveTheme = () => {
         if (!activeTheme) {
@@ -247,6 +285,7 @@ export const ContextProvider = ({ children }) => {
                 deleteTheme,
                 addTheme,
                 saveTheme,
+                editTheme,
                 activeTheme,
                 setActiveTheme,
                 mode,
