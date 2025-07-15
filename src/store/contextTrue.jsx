@@ -204,7 +204,7 @@ export const ContextProvider = ({ children }) => {
     }
 
     const editTheme = (originalName, newName) => {
-        // 1) Переименовываем тему в списке themes
+        // Переименовываем тему в списке themes
         setThemes((prev) =>
             prev.map((theme) =>
                 theme.id === originalName
@@ -213,7 +213,7 @@ export const ContextProvider = ({ children }) => {
             )
         )
 
-        // 2. Обновляем все слова этой темы, используя editWord
+        // Обновляем все слова этой темы, используя editWord
         words
             .filter((word) => word.tags === originalName)
             .forEach((word) => {
@@ -222,38 +222,15 @@ export const ContextProvider = ({ children }) => {
                     tags_json: JSON.stringify([newName]),
                 })
             })
-        // // Обновляем тему в словах
-        // setWords((prev) =>
-        //     prev.map((word) =>
-        //         word.tags === originalName
-        //             ? {
-        //                   ...word,
-        //                   tags: newName,
-        //                   tags_json: JSON.stringify([newName]),
-        //               }
-        //             : word
-        //     )
-        // )
-
-        // // Запускаяем простановку статуса словам
-        // setServerActions((prev) => {
-        //     const updated = { ...prev }
-        //     words.forEach((word) => {
-        //         if (word.tags === newName && updated[word.id] !== 'add') {
-        //             updated[word.id] = 'update'
-        //         }
-        //     })
-        //     return updated
-        // })
     }
 
-    const saveTheme = () => {
+    const saveTheme = async () => {
         if (!activeTheme) {
             console.warn('Нет активной темы')
             return
         }
 
-        const preparedWords = activeTheme.words
+        const preparedWords = (activeTheme.words || [])
             .filter((word) => word.english.trim() && word.russian.trim())
             .map(
                 ({ id, english, transcription, russian, tags, tags_json }) => ({
@@ -266,8 +243,23 @@ export const ContextProvider = ({ children }) => {
                 })
             )
 
-        dispatch(saveWordsToServer(preparedWords, activeTheme.serverActions))
-        dispatch(setScreenState('view'))
+        const actions = {}
+        preparedWords.forEach((word) => {
+            if (serverActions[word.id]) {
+                actions[word.id] = serverActions[word.id]
+            }
+        })
+
+        console.log(preparedWords)
+
+        try {
+            await api.sendWords(preparedWords, actions)
+            setServerActions({})
+            setMode('view')
+            console.log('Слова темы успешно сохранены')
+        } catch (error) {
+            console.error('Ошибка при сохранении темы:', error)
+        }
     }
 
     return (
