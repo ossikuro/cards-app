@@ -1,6 +1,8 @@
 //хуки
 import { useContext, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+
 //компоненты
 import Controls from '../../components/Controls/index.jsx'
 import Header from '../../components/Header/Header.jsx'
@@ -14,8 +16,7 @@ import emptyImage from '../../assets/emptyImage.png'
 import './TrainingPage.scss'
 
 const TrainingPage = () => {
-    //const navigate = useNavigate()
-    //const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const { activeTheme, setMode } = useContext(AppContext)
 
