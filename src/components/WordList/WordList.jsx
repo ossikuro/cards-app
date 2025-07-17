@@ -23,7 +23,8 @@ const WordList = () => {
         const activeTheme = state.themesStore.themes.find(
             (t) => t.id === state.themesStore.activeThemeId
         )
-        return activeTheme?.words || []
+        // Скрываем слова, помеченные как удалённые
+        return activeTheme?.words?.filter((w) => !w.isDeleted) || []
     })
 
     const addedInitialWords = useRef(false)

@@ -140,6 +140,39 @@ const saveWordsToServer = (words, serverActions) => async (dispatch) => {
     )
 }
 
+// Вот сам "асинхронный" thunk
+// themeSlice.js
+const deleteThemeAsync = (themeId) => async (dispatch, getState) => {
+    let theme = getState().themesStore.themes.find((t) => t.id === themeId)
+    if (!theme) return
+
+    await Promise.all(
+        theme.words.map((word) =>
+            dispatch(themeSlice.actions.deleteWord({ id: word.id, themeId }))
+        )
+    )
+
+    theme = getState().themesStore.themes.find((t) => t.id === themeId)
+
+    const wordsForServer = Object.keys(theme.serverActions).map((id) => {
+        const word = theme.words.find((w) => w.id === id)
+        if (word) {
+            return {
+                id: word.id,
+                english: word.english || '',
+                russian: word.russian || '',
+                transcription: word.transcription || '',
+                tags: word.tags,
+                tags_json: word.tags_json,
+            }
+        }
+        return { id }
+    })
+
+    await dispatch(saveWordsToServer(wordsForServer, theme.serverActions))
+    dispatch(themeSlice.actions.deleteTheme(themeId))
+}
+
 const themeSlice = createSlice({
     name: 'themesStore',
     initialState,
@@ -174,6 +207,7 @@ const themeSlice = createSlice({
                 state.activeThemeId = null
             }
         },
+
         setActiveTheme: (state, action) => {
             state.activeThemeId = action.payload
         },
@@ -229,12 +263,39 @@ const themeSlice = createSlice({
             }
         },
         deleteWord: (state, action) => {
+            // Если payload — просто id, поддержка старого варианта для обратной совместимости:
+            const id =
+                typeof action.payload === 'string'
+                    ? action.payload
+                    : action.payload.id
+            const themeId =
+                typeof action.payload === 'object'
+                    ? action.payload.themeId
+                    : state.activeThemeId
+
+            // НАЙДИ ИМЕННО ТУ ТЕМУ, которую нужно
+            const theme = state.themes.find((t) => t.id === themeId)
+            if (theme) {
+                const word = theme.words.find((w) => w.id === id)
+                if (word) {
+                    word.isDeleted = true
+                }
+                if (theme.serverActions[id] !== 'add') {
+                    theme.serverActions[id] = 'delete'
+                } else {
+                    delete theme.serverActions[id]
+                }
+            }
+        },
+        cleanDeletedWords: (state) => {
             const theme = state.themes.find((t) => t.id === state.activeThemeId)
             if (theme) {
-                theme.words = theme.words.filter((w) => w.id !== action.payload)
-                if (theme.serverActions[id] !== 'add') {
-                    theme.serverActions[action.payload.id] = 'delete'
-                }
+                theme.words = theme.words.filter((w) => !w.isDeleted)
+                Object.keys(theme.serverActions).forEach((id) => {
+                    if (theme.serverActions[id] === 'delete') {
+                        delete theme.serverActions[id]
+                    }
+                })
             }
         },
     },
@@ -250,8 +311,9 @@ export const {
     updateWord,
     deleteWord,
     setFetchedThemes,
+    cleanDeletedWords,
 } = themeSlice.actions
 
-export { loadWordsFromServer, saveWordsToServer }
+export { loadWordsFromServer, saveWordsToServer, deleteThemeAsync }
 
 export default themeSlice.reducer

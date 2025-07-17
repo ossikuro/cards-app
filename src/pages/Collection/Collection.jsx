@@ -13,6 +13,8 @@ import {
     deleteTheme,
     setWords,
     saveWordsToServer,
+    cleanDeletedWords,
+    deleteThemeAsync,
 } from '../../store/themeSlice'
 import { setScreenState } from '../../store/themeScreenSlice'
 // стили и картинки
@@ -41,36 +43,39 @@ const Collection = () => {
     }, [activeThemeId, themes, dispatch])
 
     const handleDelete = () => {
-        dispatch(deleteTheme(activeThemeId))
+        dispatch(deleteThemeAsync(activeThemeId))
         navigate('/')
     }
 
-    const handleSave = () => {
-        if (!activeTheme) {
-            console.warn('Нет активной темы')
-            return
-        }
+    const handleSave = async () => {
+        if (!activeTheme) return
 
-        const preparedWords = activeTheme.words
-            .filter((word) => word.english.trim() && word.russian.trim())
-            .map(
-                ({ id, english, transcription, russian, tags, tags_json }) => ({
-                    id,
-                    english: english.trim(),
-                    transcription: transcription.trim(),
-                    russian: russian.trim(),
-                    tags,
-                    tags_json,
-                })
-            )
-        console.log('🎯 preparedWords', preparedWords)
-        console.log(
-            '📦 JSON.stringify:',
-            JSON.stringify(preparedWords, null, 2)
+        // Собери все id, по которым есть действия (add/update/delete)
+        const allActionIds = Object.keys(activeTheme.serverActions)
+
+        // Для каждого id — ищем слово, если оно осталось (иначе формируем объект только с id)
+        const wordsForServer = allActionIds.map((id) => {
+            const word = activeTheme.words.find((w) => w.id === id)
+            if (word) {
+                // Верни шаблон, который нужен серверу
+                return {
+                    id: word.id,
+                    english: word.english || '',
+                    russian: word.russian || '',
+                    transcription: word.transcription || '',
+                    tags: word.tags,
+                    tags_json: word.tags_json,
+                }
+            }
+            return { id }
+        })
+
+        // Отправь на сервер
+        await dispatch(
+            saveWordsToServer(wordsForServer, activeTheme.serverActions)
         )
-
-        console.log('Отправляем на сервер:', preparedWords)
-        dispatch(saveWordsToServer(preparedWords, activeTheme.serverActions))
+        // После успешного сохранения — чистим удалённые
+        dispatch(cleanDeletedWords())
         dispatch(setScreenState('view'))
     }
 

@@ -1,5 +1,10 @@
 import ThemeCard from '../ThemeCard/ThemeCard'
-import { addTheme, deleteTheme, setActiveTheme } from '../../store/themeSlice'
+import {
+    addTheme,
+    deleteTheme,
+    setActiveTheme,
+    deleteThemeAsync,
+} from '../../store/themeSlice'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
@@ -55,7 +60,10 @@ const ThemeList = ({ themes = [], setMode }) => {
                         },
                         {
                             label: 'Удалить тему',
-                            onClick: () => dispatch(deleteTheme(theme.id)),
+                            onClick: () => {
+                                dispatch(deleteThemeAsync(theme.id))
+                                navigate('/')
+                            },
                         },
                     ]}
                 />
