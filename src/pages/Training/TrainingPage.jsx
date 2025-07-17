@@ -84,7 +84,7 @@ const TrainingPage = () => {
             {words.length > 0 ? (
                 <WordListTraining
                     words={words}
-                    setLearnedCount={setLearnedCount}
+                    onLearnedCountChange={setLearnedCount}
                 />
             ) : (
                 <div className="training_empty">

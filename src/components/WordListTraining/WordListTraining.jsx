@@ -4,8 +4,16 @@ import WordCardTraining from '../WordCardTraining/WordCardTraining'
 import victoryImage from '../../assets/victoryImage.png'
 import './WordListTraining.scss'
 
-const WordListTraining = ({ words = [], setLearnedCount }) => {
+const WordListTraining = ({ words = [], onLearnedCountChange }) => {
     const [index, setIndex] = useState(0)
+    const [revealedWordIds, setRevealedWordIds] = useState([])
+
+    // Как только revealedWordIds изменился, обновляем внешний счетчик:
+    useEffect(() => {
+        if (typeof onLearnedCountChange === 'function') {
+            onLearnedCountChange(revealedWordIds.length)
+        }
+    }, [revealedWordIds, onLearnedCountChange])
 
     const next = () => {
         if (index < words.length) {
@@ -19,13 +27,9 @@ const WordListTraining = ({ words = [], setLearnedCount }) => {
         }
     }
 
-    const [revealedWordIds, setRevealedWordIds] = useState([])
-
     const handleReveal = (id) => {
-        if (!revealedWordIds.includes(id)) {
-            setRevealedWordIds((revealWords) => [...revealWords, id])
-            setLearnedCount((revealWordsNum) => revealWordsNum + 1)
-        }
+        // Если это слово еще не было отмечено как изученное:
+        setRevealedWordIds((ids) => (ids.includes(id) ? ids : [...ids, id]))
     }
 
     const isFinished = index >= words.length

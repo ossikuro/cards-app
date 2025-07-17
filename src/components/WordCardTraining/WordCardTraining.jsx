@@ -17,7 +17,6 @@ const WordCardTraining = ({ data = {}, onReveal }) => {
     }
 
     const [autoRef, , isAutoFocused] = useAutoFocus(true)
-    console.log('🧪 isAutoFocused:', isAutoFocused)
 
     return (
         <div className="wordCardTraining_wrapper">
