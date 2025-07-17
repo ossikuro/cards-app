@@ -35,7 +35,7 @@ const loadWordsFromServer = () => async (dispatch) => {
                 id: nanoid(),
                 name: tags || 'Без названия',
                 tags: tags,
-                tags_json: '', // если хочешь позже использовать — пусть будет
+                tags_json: '',
                 words: words,
                 serverActions: {},
             })
@@ -140,8 +140,6 @@ const saveWordsToServer = (words, serverActions) => async (dispatch) => {
     )
 }
 
-// Вот сам "асинхронный" thunk
-// themeSlice.js
 const deleteThemeAsync = (themeId) => async (dispatch, getState) => {
     let theme = getState().themesStore.themes.find((t) => t.id === themeId)
     if (!theme) return
@@ -196,7 +194,7 @@ const themeSlice = createSlice({
                 id: nanoid(),
                 name: tags,
                 tags: tags,
-                tags_json: '', // ⬅ оставляем пустым
+                tags_json: '',
                 words: [],
                 serverActions: {},
             })
