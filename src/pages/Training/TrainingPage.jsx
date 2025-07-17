@@ -20,12 +20,14 @@ const TrainingPage = () => {
 
     const { activeTheme, setMode } = useContext(AppContext)
 
-    const activeThemeId = useSelector(
-        (state) => state.themesStore.activeThemeId
-    )
+    //const activeThemeId = useSelector(
+    //    (state) => state.themesStore.activeThemeId
+    //)
 
     const allWords = activeTheme?.words || []
     const themeName = activeTheme?.name || 'Без названия'
+
+    console.log(activeTheme)
 
     const [learnedCount, setLearnedCount] = useState(0)
 

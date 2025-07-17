@@ -22,6 +22,7 @@ const Collection = () => {
         setActiveTheme,
         deleteTheme,
         editTheme,
+        saveTheme,
         words,
         setWords,
         mode,
@@ -86,9 +87,14 @@ const Collection = () => {
         )
 
         setActiveTheme((prev) => ({ ...prev, name: themeName }))
-        await saveWords()
+        //  await saveWords(themeName)
+        await saveTheme()
         setMode('view')
     }
+
+    useEffect(() => {
+        void saveWords()
+    }, [words])
 
     // ====== ОТЛАДОЧНЫЙ БЛОК ======
 

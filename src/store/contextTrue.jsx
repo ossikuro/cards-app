@@ -31,17 +31,20 @@ export const ContextProvider = ({ children }) => {
         setError(null)
 
         try {
-            const apiWords = await api.getWords()
+            let apiWords = await api.getWords()
             const apiThemes = {}
 
             // собираем названия тем
-            apiWords.forEach((word) => {
+
+            apiWords = apiWords.map((word) => {
                 const theme = word.tags || 'Без названия'
 
                 if (!apiThemes[theme]) {
                     apiThemes[theme] = []
                 }
-                apiThemes[theme].push(word)
+                const payload = { ...word, tags: theme }
+                apiThemes[theme].push(payload)
+                return payload
             })
 
             // Формируем массив тем с нужной структурой
@@ -65,15 +68,17 @@ export const ContextProvider = ({ children }) => {
     }
 
     const saveWords = async () => {
-        if (!activeTheme) return
-        const wordsToSave = words.filter(
-            (word) => word.tags === activeTheme.name
-        )
+        console.log(activeTheme)
+
+        const wordsToSave = words.filter((word) => {
+            return word.tags === activeTheme.name
+        })
         console.log('🔍 saveWords — wordsToSave:', wordsToSave)
         console.log(
             '🔍 saveWords — serverActions перед отправкой:',
             serverActions
         )
+
         try {
             await api.sendWords(wordsToSave, serverActions)
             setServerActions({})
