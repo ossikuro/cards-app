@@ -67,34 +67,26 @@ export const ContextProvider = ({ children }) => {
         }
     }
 
-    const saveWords = async () => {
-        console.log(activeTheme)
+    // const saveWords = async () => {
 
-        const wordsToSave = words.filter((word) => {
-            return word.tags === activeTheme.name
-        })
-        console.log('🔍 saveWords — wordsToSave:', wordsToSave)
-        console.log(
-            '🔍 saveWords — serverActions перед отправкой:',
-            serverActions
-        )
+    //     const wordsToSave = words.filter((word) => {
+    //         return word.tags === activeTheme.name
+    //     })
 
-        try {
-            await api.sendWords(wordsToSave, serverActions)
-            setServerActions({})
-            setMode('view')
-            console.log('Слова успешно сохранены')
-        } catch (error) {
-            console.error('Ошибка при сохранении:', error)
-        }
-    }
+    //     try {
+    //         await api.sendWords(wordsToSave, serverActions)
+    //         setServerActions({})
+    //         setMode('view')
+    //         console.log('Слова успешно сохранены')
+    //     } catch (error) {
+    //         console.error('Ошибка при сохранении:', error)
+    //     }
+    // }
 
+    // ВСТАВИТЬ: вместо вашей deleteWord
     const deleteWord = (id) => {
-        const cleanCollection = words.filter((word) => word.id !== id)
         setServerActions((prev) => ({ ...prev, [id]: 'delete' }))
-        setWords(cleanCollection)
-
-        console.log(cleanCollection)
+        // НЕ удаляем из words!! Только отмечаем для удаления
     }
 
     /** payload = {} */
@@ -131,11 +123,6 @@ export const ContextProvider = ({ children }) => {
     }
 
     const deleteTheme = async (themeId) => {
-        console.log(
-            '🗑️ deleteTheme — все теги в словах:',
-            words.map((w) => w.tags)
-        )
-
         // 1) Собираем ID всех слов, подходящих под удаление темы
         const idsToDelete = words
             .filter(
@@ -207,9 +194,7 @@ export const ContextProvider = ({ children }) => {
         }
         setThemes((prev) => [...prev, newTheme])
     }
-
     const editTheme = (originalName, newName) => {
-        // Переименовываем тему в списке themes
         setThemes((prev) =>
             prev.map((theme) =>
                 theme.id === originalName
@@ -217,8 +202,7 @@ export const ContextProvider = ({ children }) => {
                     : theme
             )
         )
-
-        // Обновляем все слова этой темы, используя editWord
+        // Найти id всех слов старой темы
         words
             .filter((word) => word.tags === originalName)
             .forEach((word) => {
@@ -230,13 +214,18 @@ export const ContextProvider = ({ children }) => {
     }
 
     const saveTheme = async () => {
-        if (!activeTheme) {
-            console.warn('Нет активной темы')
-            return
-        }
+        if (!activeTheme) return
+        const themeName = activeTheme.name
 
-        const preparedWords = (activeTheme.words || [])
-            .filter((word) => word.english.trim() && word.russian.trim())
+        // Слова для сохранения/обновления (НЕ отправляем, если отмечены на удаление!)
+        const preparedWords = words
+            .filter(
+                (word) =>
+                    word.tags === themeName &&
+                    serverActions[word.id] !== 'delete' &&
+                    word.english.trim() &&
+                    word.russian.trim()
+            )
             .map(
                 ({ id, english, transcription, russian, tags, tags_json }) => ({
                     id,
@@ -248,20 +237,30 @@ export const ContextProvider = ({ children }) => {
                 })
             )
 
-        const actions = {}
-        preparedWords.forEach((word) => {
-            if (serverActions[word.id]) {
-                actions[word.id] = serverActions[word.id]
-            }
-        })
+        // ID для удаления
+        const deletedIds = Object.entries(serverActions)
+            .filter(([_, action]) => action === 'delete')
+            .map(([id]) => id)
 
-        console.log(preparedWords)
+        console.log('preparedWords', preparedWords)
+        console.log('deletedIds', deletedIds)
 
         try {
-            await api.sendWords(preparedWords, actions)
+            console.log(
+                'CALL api.sendWords!',
+                preparedWords,
+                serverActions,
+                deletedIds
+            )
+            // ПРИМЕЧАНИЕ: Ваш api.sendWords должен принимать deletedIds третьим аргументом!
+            await api.sendWords(preparedWords, serverActions, deletedIds)
+
+            // После успеха очищаем удалённые слова локально
+            setWords((prev) =>
+                prev.filter((word) => !deletedIds.includes(word.id))
+            )
             setServerActions({})
             setMode('view')
-            console.log('Слова темы успешно сохранены')
         } catch (error) {
             console.error('Ошибка при сохранении темы:', error)
         }
@@ -276,7 +275,7 @@ export const ContextProvider = ({ children }) => {
                 editWord,
                 addWord,
                 loadWords,
-                saveWords,
+                //saveWords,
                 themes,
                 setThemes,
                 deleteTheme,
@@ -287,6 +286,8 @@ export const ContextProvider = ({ children }) => {
                 setActiveTheme,
                 mode,
                 setMode,
+                serverActions,
+                setServerActions,
             }}
         >
             {children}

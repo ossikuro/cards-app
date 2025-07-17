@@ -11,10 +11,20 @@ import './WordList.scss'
 import { AppContext } from '../../store/contextTrue'
 
 const WordList = ({ themeName }) => {
-    const { words, setWords, addWord, editWord, deleteWord, mode } =
-        useContext(AppContext)
+    const {
+        words,
+        setWords,
+        addWord,
+        editWord,
+        deleteWord,
+        mode,
+        serverActions,
+    } = useContext(AppContext)
 
-    const filteredWords = words.filter((word) => word.tags === themeName)
+    const filteredWords = words.filter(
+        (word) =>
+            word.tags === themeName && serverActions?.[word.id] !== 'delete' // <- исключаем помеченные на удаление
+    )
 
     const wasEmptyInit = useRef(false) // для слежки за количеством карточек на странице
 

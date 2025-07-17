@@ -27,7 +27,8 @@ const Collection = () => {
         setWords,
         mode,
         setMode,
-        saveWords,
+        serverActions,
+        //saveWords,
     } = useContext(AppContext)
 
     /** автовыбор первой темы как активной */
@@ -41,17 +42,30 @@ const Collection = () => {
     const [themeName, setThemeName] = useState(
         activeTheme?.name || 'Без названия'
     )
+
     // Реф для хранения оригинального имени
     const originalName = useRef(activeTheme?.name)
 
+    // замена названия активной темы
     useEffect(() => {
         setThemeName(activeTheme?.name || 'Без названия')
     }, [activeTheme])
 
     // фильтрация слов по активной теме
     const filteredWords = words.filter(
-        (word) => word && word.tags === activeTheme?.name
+        (word) =>
+            word.tags === activeTheme?.name &&
+            serverActions[word.id] !== 'delete'
     )
+    // фактическое сохранение
+    useEffect(() => {
+        if (mode === 'pendingSave') {
+            ;(async () => {
+                await saveTheme()
+                setMode('view')
+            })()
+        }
+    }, [mode, words, themes, activeTheme, serverActions])
 
     const handleDelete = () => {
         if (activeTheme) {
@@ -61,23 +75,18 @@ const Collection = () => {
         }
     }
 
-    const handleSave = async () => {
-        console.log('Сохраняем тему:', activeTheme, '→', themeName)
-
-        if (themeName.trim() && activeTheme !== originalName.current) {
-            editTheme(originalName.current, themeName)
+    const handleSave = () => {
+        if (themeName.trim() && activeTheme && activeTheme.name !== themeName) {
+            editTheme(activeTheme.name, themeName)
         }
 
-        // Обновляем массив тем, меняя только у нужного объекта
         setThemes((prev) =>
             prev.map((theme) =>
                 theme.id === activeTheme.id
-                    ? { ...theme, name: themeName }
+                    ? { ...theme, name: themeName, id: themeName }
                     : theme
             )
         )
-
-        // Обновляем теги у слов по старому имени темы
         setWords((prev) =>
             prev.map((word) =>
                 word.tags === activeTheme.name
@@ -85,16 +94,13 @@ const Collection = () => {
                     : word
             )
         )
-
-        setActiveTheme((prev) => ({ ...prev, name: themeName }))
-        //  await saveWords(themeName)
-        await saveTheme()
-        setMode('view')
+        setActiveTheme((prev) => ({ ...prev, name: themeName, id: themeName }))
+        setMode('pendingSave')
     }
 
-    useEffect(() => {
-        void saveWords()
-    }, [words])
+    // useEffect(() => {
+    //     void saveWords()
+    // }, [words])
 
     // ====== ОТЛАДОЧНЫЙ БЛОК ======
 
@@ -186,7 +192,10 @@ const Collection = () => {
                         </p>
                     </div>
                 ) : (
-                    <WordList themeName={activeTheme?.name} />
+                    <WordList
+                        words={filteredWords}
+                        themeName={activeTheme?.name}
+                    />
                 )}
             </div>
         </div>
