@@ -76,6 +76,7 @@ const Collection = () => {
     }
 
     const handleSave = () => {
+        // запускаем событие если значение в инпуте не пустое, если у нас есть активная тема, если у нас имя старое отличается от нового
         if (themeName.trim() && activeTheme && activeTheme.name !== themeName) {
             editTheme(activeTheme.name, themeName)
         }
@@ -94,13 +95,10 @@ const Collection = () => {
                     : word
             )
         )
+
         setActiveTheme((prev) => ({ ...prev, name: themeName, id: themeName }))
         setMode('pendingSave')
     }
-
-    // useEffect(() => {
-    //     void saveWords()
-    // }, [words])
 
     // ====== ОТЛАДОЧНЫЙ БЛОК ======
 
