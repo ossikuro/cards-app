@@ -1,6 +1,6 @@
 //хуки
 import { useContext, useState } from 'react'
-import { useSelector } from 'react-redux'
+
 import { useNavigate } from 'react-router-dom'
 
 //компоненты
@@ -19,10 +19,6 @@ const TrainingPage = () => {
     const navigate = useNavigate()
 
     const { activeTheme, setMode } = useContext(AppContext)
-
-    //const activeThemeId = useSelector(
-    //    (state) => state.themesStore.activeThemeId
-    //)
 
     const allWords = activeTheme?.words || []
     const themeName = activeTheme?.name || 'Без названия'
