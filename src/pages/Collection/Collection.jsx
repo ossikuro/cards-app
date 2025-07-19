@@ -48,7 +48,7 @@ const Collection = () => {
 
     // замена названия активной темы
     useEffect(() => {
-        setThemeName(activeTheme?.name || 'Без названия')
+        setThemeName(activeTheme?.name ?? 'Без названия')
     }, [activeTheme])
 
     // фильтрация слов по активной теме
